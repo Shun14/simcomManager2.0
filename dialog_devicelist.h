@@ -2,6 +2,7 @@
 #define DIALOG_DEVICELIST_H
 
 #include <QDialog>
+#include <QKeyEvent>
 
 namespace Ui {
 class Dialog_deviceList;
@@ -24,6 +25,8 @@ private:
 private slots:
     void on_pushButton_StartLoad_clicked();
     void on_pushButton_ReadFile_clicked();
+    void slotHeaderClicked(int column);
+    void keyPressEvent(QKeyEvent *event);
 };
 
 #endif // DIALOG_DEVICELIST_H

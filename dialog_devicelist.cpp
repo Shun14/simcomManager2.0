@@ -11,6 +11,7 @@
 #include <QMenu>
 #include <QInputDialog>
 #include <QFileDialog>
+#include <QStandardItem>
 
 Dialog_deviceList::Dialog_deviceList(QWidget *parent) :
     QDialog(parent),
@@ -18,12 +19,41 @@ Dialog_deviceList::Dialog_deviceList(QWidget *parent) :
 {
     ui->setupUi(this);
     this->setWindowTitle("小安宝设备查询软件");
+    connect(ui->tableWidget->horizontalHeader(), SIGNAL(sectionClicked(int)), this, SLOT(slotHeaderClicked(int)));
 }
 
 Dialog_deviceList::~Dialog_deviceList()
 {
     delete ui;
 }
+
+void Dialog_deviceList::slotHeaderClicked(int column)
+{
+    qDebug() << "slotHeaderClicked" << column;
+    ui->tableWidget->sortByColumn(column);
+}
+
+void Dialog_deviceList::keyPressEvent(QKeyEvent *event)
+{
+    if(event->modifiers() == Qt::ControlModifier && event->key() == Qt::Key_F)
+    {
+        qDebug() << "get keyPressEvent ctrl+f";
+        bool isOK;
+        QString text = QInputDialog::getText(NULL,"小安宝设备查询软件","", QLineEdit::Normal,NULL,&isOK);
+        if(text.isEmpty())return;
+        if(ui->tableWidget->findItems(text, Qt::MatchContains).isEmpty()){
+            qDebug() << "failed to find:" << text;
+        }
+        else
+        {
+            qDebug() << "succeed to find:" << text;
+            int column = ui->tableWidget->findItems(text, Qt::MatchContains).first()->column();
+            int row = ui->tableWidget->findItems(text, Qt::MatchContains).first()->row();
+            ui->tableWidget->setCurrentCell(row, column, QItemSelectionModel::Select);
+        }
+    }
+}
+
 void Dialog_deviceList::on_pushButton_ReadFile_clicked()
 {
     QString path = QFileDialog::getOpenFileName(this, tr("小安宝设备查询软件"), ".", tr("Text Files(*.txt)"));
@@ -65,12 +95,18 @@ void Dialog_deviceList::on_pushButton_StartLoad_clicked()
         {
             findDeviceStatuswithRow(row);
         }
+
+        if(row == ui->tableWidget->rowCount())
+        {
+            isLoading = false;
+            ui->pushButton_StartLoad->setText("开始查询");
+        }
     }
     else
     {
-        ui->pushButton_StartLoad->setText("继续查询");
         row--;
         isLoading = false;
+        ui->pushButton_StartLoad->setText("继续查询");
     }
 }
 
@@ -99,56 +135,65 @@ void Dialog_deviceList::findDeviceStatuswithRow(const int row){
     QJsonObject object = jsonDocument.object();
 
     QJsonValue code = object.take("code");
-    if(!code.isUndefined())
-    {
-        return;
-    }
+    if(code.isUndefined()){
+        int version = object.take("version").toInt();
+        int version_a = version / 65536;
+        int version_b = (version % 65536) / 256;
+        int version_c = version % 256;
+        ui->tableWidget->setItem(row,1,new QTableWidgetItem(QString("%1.%2.%3").arg(version_a).arg(version_b).arg(version_c)));
 
-    int version = object.take("version").toInt();
-    int version_a = version / 65536;
-    int version_b = (version % 65536) / 256;
-    int version_c = version % 256;
-    qDebug()<<version;
-    ui->tableWidget->setItem(row,1,new QTableWidgetItem(QString("%1.%2.%3").arg(version_a).arg(version_b).arg(version_c)));
+        int state = object.take("state").toInt();
 
-    int state = object.take("state").toInt();
-    qDebug()<<state;
+        if(state){
+            ui->tableWidget->setItem(row,2,new QTableWidgetItem("在线"));
+            ui->tableWidget->item(row, 2)->setForeground(Qt::green);
+        }
+        else{
+            ui->tableWidget->setItem(row,2,new QTableWidgetItem("不在线"));
+            ui->tableWidget->item(row, 2)->setForeground(Qt::red);
+        }
 
-    if(state){
-        ui->tableWidget->setItem(row,2,new QTableWidgetItem("online"));
-        ui->tableWidget->item(row, 2)->setForeground(Qt::green);
+        QDateTime time = QDateTime::fromTime_t(object.take("timestamp").toInt());
+        ui->tableWidget->setItem(row,3,new QTableWidgetItem(time.toString("yyyy.MM.dd hh:mm:ss dddd")));
+
+        double lat = object.take("latitude").toDouble();
+        double lon = object.take("longitude").toDouble();
+        ui->tableWidget->setItem(row,4,new QTableWidgetItem(QString("%1,  %2").arg(lat).arg(lon)));
+
+        int GSM = object.take("GSM").toInt();
+        QTableWidgetItem *item_GSM = new QTableWidgetItem;
+        item_GSM->setData(Qt::DisplayRole, GSM);
+        ui->tableWidget->setItem(row, 5, item_GSM);
+        if(GSM > 20){
+            ui->tableWidget->item(row, 5)->setBackground(Qt::green);
+        }
+        else if(GSM > 10){
+            ui->tableWidget->item(row, 5)->setBackground(Qt::yellow);
+        }
+        else{
+            ui->tableWidget->item(row, 5)->setBackground(Qt::red);
+        }
+        int voltage = object.take("voltage").toInt();
+        QTableWidgetItem *item_voltage = new QTableWidgetItem;
+        item_voltage->setData(Qt::DisplayRole, voltage);
+        ui->tableWidget->setItem(row, 6, item_voltage);
+
+        int speed = object.take("speed").toInt();
+        ui->tableWidget->setItem(row,7,new QTableWidgetItem(QString("%1").arg(speed)));
+
+        int course = object.take("course").toInt();
+        ui->tableWidget->setItem(row,8,new QTableWidgetItem(QString("%1").arg(course)));
     }
     else{
-        ui->tableWidget->setItem(row,2,new QTableWidgetItem("offline"));
-        ui->tableWidget->item(row, 2)->setForeground(Qt::red);
+        ui->tableWidget->setItem(row,1,new QTableWidgetItem(QString("-")));
+        ui->tableWidget->setItem(row,2,new QTableWidgetItem("未登录"));
+        ui->tableWidget->setItem(row,3,new QTableWidgetItem(QString("-")));
+        ui->tableWidget->setItem(row,4,new QTableWidgetItem(QString("-")));
+        ui->tableWidget->setItem(row,5,new QTableWidgetItem(QString("-")));
+        ui->tableWidget->setItem(row,6,new QTableWidgetItem(QString("-")));
+        ui->tableWidget->setItem(row,7,new QTableWidgetItem(QString("-")));
+        ui->tableWidget->setItem(row,8,new QTableWidgetItem(QString("-")));
     }
-
-    QDateTime time = QDateTime::fromTime_t(object.take("timestamp").toInt());
-    ui->tableWidget->setItem(row,3,new QTableWidgetItem(time.toString("yyyy.MM.dd hh:mm:ss dddd")));
-
-    double lat = object.take("latitude").toDouble();
-    double lon = object.take("longitude").toDouble();
-    ui->tableWidget->setItem(row,4,new QTableWidgetItem(QString("%1,  %2").arg(lat).arg(lon)));
-
-    int GSM = object.take("GSM").toInt();
-    ui->tableWidget->setItem(row,5,new QTableWidgetItem(QString("%1").arg(GSM)));
-    if(GSM > 20){
-        ui->tableWidget->item(row, 5)->setBackground(Qt::green);
-    }
-    else if(GSM > 10){
-        ui->tableWidget->item(row, 5)->setBackground(Qt::yellow);
-    }
-    else{
-        ui->tableWidget->item(row, 5)->setBackground(Qt::red);
-    }
-    int voltage = object.take("voltage").toInt();
-    ui->tableWidget->setItem(row,6,new QTableWidgetItem(QString("%1").arg(voltage)));
-
-    int speed = object.take("speed").toInt();
-    ui->tableWidget->setItem(row,7,new QTableWidgetItem(QString("%1").arg(speed)));
-
-    int course = object.take("course").toInt();
-    ui->tableWidget->setItem(row,8,new QTableWidgetItem(QString("%1").arg(course)));
     ui->tableWidget->resizeColumnsToContents();
 
 }

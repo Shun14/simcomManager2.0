@@ -51,60 +51,65 @@ void MainWindow::on_pushButton_findDevice_clicked()
     ui->tableWidget_deviceState->setColumnCount(1);
 
     QJsonValue code = object.take("code");
-    if(!code.isUndefined())
-    {
-        return;
-    }
+    if(code.isUndefined()){
+        QString imei = object.take("imei").toString();
+        ui->tableWidget_deviceState->setItem(0,0,new QTableWidgetItem(imei));
 
-    QString imei = object.take("imei").toString();
-    ui->tableWidget_deviceState->setItem(0,0,new QTableWidgetItem(imei));
+        int version = object.take("version").toInt();
+        int version_a = version / 65536;
+        int version_b = (version % 65536) / 256;
+        int version_c = version % 256;
+        ui->tableWidget_deviceState->setItem(1,0,new QTableWidgetItem(QString("%1.%2.%3").arg(version_a).arg(version_b).arg(version_c)));
 
-    int version = object.take("version").toInt();
-    int version_a = version / 65536;
-    int version_b = (version % 65536) / 256;
-    int version_c = version % 256;
-    ui->tableWidget_deviceState->setItem(1,0,new QTableWidgetItem(QString("%1.%2.%3").arg(version_a).arg(version_b).arg(version_c)));
+        int state = object.take("state").toInt();
+        if(state){
+            ui->tableWidget_deviceState->setItem(2,0,new QTableWidgetItem("online"));
+            ui->tableWidget_deviceState->item(2, 0)->setForeground(Qt::green);
+        }
+        else{
+            ui->tableWidget_deviceState->setItem(2,0,new QTableWidgetItem("offline"));
+            ui->tableWidget_deviceState->item(2, 0)->setForeground(Qt::red);
+        }
 
-    int state = object.take("state").toInt();
-    if(state){
-        ui->tableWidget_deviceState->setItem(2,0,new QTableWidgetItem("online"));
-        ui->tableWidget_deviceState->item(2, 0)->setForeground(Qt::green);
+        QDateTime time = QDateTime::fromTime_t(object.take("timestamp").toInt());
+        ui->tableWidget_deviceState->setItem(3,0,new QTableWidgetItem(time.toString("yyyy.MM.dd hh:mm:ss dddd")));
+
+        double lat = object.take("latitude").toDouble();
+        double lon = object.take("longitude").toDouble();
+        ui->tableWidget_deviceState->setItem(4,0,new QTableWidgetItem(QString("%1,  %2").arg(lat).arg(lon)));
+
+        int GSM = object.take("GSM").toInt();
+        ui->tableWidget_deviceState->setItem(5,0,new QTableWidgetItem(QString("%1").arg(GSM)));
+        if(GSM > 20){
+            ui->tableWidget_deviceState->item(5, 0)->setBackground(Qt::green);
+        }
+        else if(GSM > 10){
+            ui->tableWidget_deviceState->item(5, 0)->setBackground(Qt::yellow);
+        }
+        else{
+            ui->tableWidget_deviceState->item(5, 0)->setBackground(Qt::red);
+        }
+
+        int voltage = object.take("voltage").toInt();
+        ui->tableWidget_deviceState->setItem(6,0,new QTableWidgetItem(QString("%1").arg(voltage)));
+
+        int speed = object.take("speed").toInt();
+        ui->tableWidget_deviceState->setItem(7,0,new QTableWidgetItem(QString("%1").arg(speed)));
+
+        int course = object.take("course").toInt();
+        ui->tableWidget_deviceState->setItem(8,0,new QTableWidgetItem(QString("%1").arg(course)));
     }
     else{
-        ui->tableWidget_deviceState->setItem(2,0,new QTableWidgetItem("offline"));
-        ui->tableWidget_deviceState->item(2, 0)->setForeground(Qt::red);
+        ui->tableWidget_deviceState->setItem(1,0,new QTableWidgetItem(QString("-")));
+        ui->tableWidget_deviceState->setItem(2,0,new QTableWidgetItem("未登录"));
+        ui->tableWidget_deviceState->setItem(3,0,new QTableWidgetItem(QString("-")));
+        ui->tableWidget_deviceState->setItem(4,0,new QTableWidgetItem(QString("-")));
+        ui->tableWidget_deviceState->setItem(5,0,new QTableWidgetItem(QString("-")));
+        ui->tableWidget_deviceState->setItem(6,0,new QTableWidgetItem(QString("-")));
+        ui->tableWidget_deviceState->setItem(7,0,new QTableWidgetItem(QString("-")));
+        ui->tableWidget_deviceState->setItem(8,0,new QTableWidgetItem(QString("-")));
     }
-
-    QDateTime time = QDateTime::fromTime_t(object.take("timestamp").toInt());
-    ui->tableWidget_deviceState->setItem(3,0,new QTableWidgetItem(time.toString("yyyy.MM.dd hh:mm:ss dddd")));
-
-    double lat = object.take("latitude").toDouble();
-    double lon = object.take("longitude").toDouble();
-    ui->tableWidget_deviceState->setItem(4,0,new QTableWidgetItem(QString("%1,  %2").arg(lat).arg(lon)));
-
-    int GSM = object.take("GSM").toInt();
-    ui->tableWidget_deviceState->setItem(5,0,new QTableWidgetItem(QString("%1").arg(GSM)));
-    if(GSM > 20){
-        ui->tableWidget_deviceState->item(5, 0)->setBackground(Qt::green);
-    }
-    else if(GSM > 10){
-        ui->tableWidget_deviceState->item(5, 0)->setBackground(Qt::yellow);
-    }
-    else{
-        ui->tableWidget_deviceState->item(5, 0)->setBackground(Qt::red);
-    }
-
-    int voltage = object.take("voltage").toInt();
-    ui->tableWidget_deviceState->setItem(6,0,new QTableWidgetItem(QString("%1").arg(voltage)));
-
-    int speed = object.take("speed").toInt();
-    ui->tableWidget_deviceState->setItem(7,0,new QTableWidgetItem(QString("%1").arg(speed)));
-
-    int course = object.take("course").toInt();
-    ui->tableWidget_deviceState->setItem(8,0,new QTableWidgetItem(QString("%1").arg(course)));
-
     ui->tableWidget_deviceState->resizeColumnsToContents();
-
 }
 
 void MainWindow::on_pushButton_FindDeviceLog_clicked()

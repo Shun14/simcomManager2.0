@@ -2,6 +2,7 @@
 #include "ui_mainwindow.h"
 #include "dialog_findlog.h"
 #include "dialog_devicelog.h"
+#include "dialog_devicelist.h"
 
 #include <QtNetwork>
 #include <QMessageBox>
@@ -17,8 +18,8 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     this->setWindowTitle("小安宝设备查询软件");
-    this->setMaximumSize(289,494);
-    this->setMinimumSize(289,494);
+    this->setMaximumSize(289,517);
+    this->setMinimumSize(289,517);
     setWindowIcon(QIcon(" xiaoanbao.ico"));    
 }
 
@@ -49,8 +50,11 @@ void MainWindow::on_pushButton_findDevice_clicked()
     QJsonObject object = jsonDocument.object();
     ui->tableWidget_deviceState->setColumnCount(1);
 
-    int code = object.take("code").toInt();
-    qDebug()<<code;
+    QJsonValue code = object.take("code");
+    if(!code.isUndefined())
+    {
+        return;
+    }
 
     QString imei = object.take("imei").toString();
     ui->tableWidget_deviceState->setItem(0,0,new QTableWidgetItem(imei));
@@ -72,7 +76,7 @@ void MainWindow::on_pushButton_findDevice_clicked()
     }
 
     QDateTime time = QDateTime::fromTime_t(object.take("timestamp").toInt());
-    ui->tableWidget_deviceState->setItem(3,0,new QTableWidgetItem(time.toString()));
+    ui->tableWidget_deviceState->setItem(3,0,new QTableWidgetItem(time.toString("yyyy.MM.dd hh:mm:ss dddd")));
 
     double lat = object.take("latitude").toDouble();
     double lon = object.take("longitude").toDouble();
@@ -80,11 +84,14 @@ void MainWindow::on_pushButton_findDevice_clicked()
 
     int GSM = object.take("GSM").toInt();
     ui->tableWidget_deviceState->setItem(5,0,new QTableWidgetItem(QString("%1").arg(GSM)));
-    if(GSM > 15){
-        ui->tableWidget_deviceState->item(5, 0)->setForeground(Qt::green);
+    if(GSM > 20){
+        ui->tableWidget_deviceState->item(5, 0)->setBackground(Qt::green);
+    }
+    else if(GSM > 10){
+        ui->tableWidget_deviceState->item(5, 0)->setBackground(Qt::yellow);
     }
     else{
-        ui->tableWidget_deviceState->item(5, 0)->setForeground(Qt::red);
+        ui->tableWidget_deviceState->item(5, 0)->setBackground(Qt::red);
     }
 
     int voltage = object.take("voltage").toInt();
@@ -134,6 +141,15 @@ void MainWindow::on_pushButton_FindDeviceLog_clicked()
         event.exec();
     }
     ui->label_findLog->setText("");
+}
+
+void MainWindow::on_pushButton_FindDeviceList_clicked()
+{
+    Dialog_deviceList deviceList(this);
+    if(deviceList.exec() != 0)
+    {
+        return;
+    }
 }
 
 void MainWindow::on_pushButton_GPS_clicked()

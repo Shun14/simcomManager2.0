@@ -16,15 +16,18 @@ TEMPLATE = app
 SOURCES += main.cpp\
         mainwindow.cpp \
     dialog_findlog.cpp \
-    dialog_devicelog.cpp
+    dialog_devicelog.cpp \
+    dialog_devicelist.cpp
 
 HEADERS  += mainwindow.h \
     dialog_findlog.h \
-    dialog_devicelog.h
+    dialog_devicelog.h \
+    dialog_devicelist.h
 
 FORMS    += mainwindow.ui \
     dialog_findlog.ui \
-    dialog_devicelog.ui
+    dialog_devicelog.ui \
+    dialog_devicelist.ui
 
 DISTFILES +=
 

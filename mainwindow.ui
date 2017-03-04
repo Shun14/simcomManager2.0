@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>289</width>
-    <height>494</height>
+    <height>517</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -58,7 +58,7 @@
      </font>
     </property>
     <property name="text">
-     <string>118.89.104.130</string>
+     <string>api.xiaoan110.com</string>
     </property>
     <property name="alignment">
      <set>Qt::AlignCenter</set>
@@ -306,7 +306,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>440</y>
+      <y>430</y>
       <width>271</width>
       <height>31</height>
      </rect>
@@ -342,15 +342,15 @@
      </font>
     </property>
     <property name="text">
-     <string>865067023193645</string>
+     <string>86506702</string>
     </property>
    </widget>
    <widget class="QLabel" name="label_findLog">
     <property name="geometry">
      <rect>
-      <x>13</x>
-      <y>411</y>
-      <width>261</width>
+      <x>10</x>
+      <y>400</y>
+      <width>271</width>
       <height>21</height>
      </rect>
     </property>
@@ -460,10 +460,46 @@
      <string>upgrade</string>
     </property>
    </widget>
+   <widget class="QPushButton" name="pushButton_FindDeviceList">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>460</y>
+      <width>271</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Agency FB</family>
+      <pointsize>12</pointsize>
+      <weight>75</weight>
+      <bold>true</bold>
+     </font>
+    </property>
+    <property name="text">
+     <string>批量查询状态</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <tabstops>
+  <tabstop>lineEdit_IP</tabstop>
+  <tabstop>lineEdit_port</tabstop>
+  <tabstop>lineEdit_IMEI</tabstop>
+  <tabstop>pushButton_findDevice</tabstop>
+  <tabstop>pushButton_GPS</tabstop>
+  <tabstop>pushButton_GSM</tabstop>
+  <tabstop>pushButton_LOG</tabstop>
+  <tabstop>pushButton_SETTING</tabstop>
+  <tabstop>pushButton_BATTERY</tabstop>
+  <tabstop>pushButton_REBOOT</tabstop>
+  <tabstop>pushButton_UPGRADE</tabstop>
+  <tabstop>pushButton_FindDeviceLog</tabstop>
+  <tabstop>tableWidget_deviceState</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

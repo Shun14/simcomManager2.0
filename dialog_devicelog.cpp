@@ -28,7 +28,7 @@ Dialog_deviceLog::Dialog_deviceLog(QWidget *parent, QString result) :
         {
             QJsonObject obj = obj_value.toObject();
             ui->tableWidget->setRowCount(rowNum + 1);
-            ui->tableWidget->setItem(rowNum, 0, new QTableWidgetItem(QDateTime::fromTime_t(obj.take("timestamp").toInt()).toString()));
+            ui->tableWidget->setItem(rowNum, 0, new QTableWidgetItem(QDateTime::fromTime_t(obj.take("timestamp").toInt()).toString("yyyy.MM.dd hh:mm:ss dddd")));
             ui->tableWidget->setItem(rowNum, 1, new QTableWidgetItem(obj.take("event").toString()));
             rowNum++;
         }

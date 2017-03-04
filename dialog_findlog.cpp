@@ -1,5 +1,7 @@
 #include "dialog_findlog.h"
 #include "ui_dialog_findlog.h"
+#include <QDebug>
+#include <QDateTime>
 
 Dialog_findLog::Dialog_findLog(QWidget *parent) :
     QDialog(parent),
@@ -10,6 +12,7 @@ Dialog_findLog::Dialog_findLog(QWidget *parent) :
     QDateTime time = QDateTime::currentDateTime();
     ui->dateTimeEdit_start->setDateTime(time);
     ui->dateTimeEdit_end->setDateTime(time);
+    ui->dateTimeEdit_start->setTime(QTime::fromMSecsSinceStartOfDay(0));
 }
 
 Dialog_findLog::~Dialog_findLog()

@@ -30,6 +30,16 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_pushButton_findDevice_clicked()
 {
+    if(ui->lineEdit_IMEI->text().isEmpty()){
+        QMessageBox::information(this, QString("小安提示"),QString("请输入IMEI号码！\n"));
+        return;
+    }
+
+    if(ui->lineEdit_IMEI->text().length() != 15){
+        QMessageBox::information(this, QString("小安提示"),QString("请输入正确的IMEI号码！\n"));
+        return;
+    }
+
     QString url = "http://" + ui->lineEdit_IP->text().toLatin1() +
                   ":"+ui->lineEdit_port->text().toLatin1() +
                   "/v1/imeiData/" + ui->lineEdit_IMEI->text().toLatin1();
@@ -159,6 +169,16 @@ void MainWindow::on_pushButton_FindDeviceList_clicked()
 
 void MainWindow::on_pushButton_GPS_clicked()
 {
+    if(ui->lineEdit_IMEI->text().isEmpty()){
+        QMessageBox::information(this, QString("小安提示"),QString("请输入IMEI号码！\n"));
+        return;
+    }
+
+    if(ui->lineEdit_IMEI->text().length() != 15){
+        QMessageBox::information(this, QString("小安提示"),QString("请输入正确的IMEI号码！\n"));
+        return;
+    }
+
     QString url = "http://" + ui->lineEdit_IP->text().toLatin1() +
                   ":"+ui->lineEdit_port->text().toLatin1() +
                   "/v1/device";
@@ -183,6 +203,16 @@ void MainWindow::on_pushButton_GPS_clicked()
 
 void MainWindow::on_pushButton_GSM_clicked()
 {
+    if(ui->lineEdit_IMEI->text().isEmpty()){
+        QMessageBox::information(this, QString("小安提示"),QString("请输入IMEI号码！\n"));
+        return;
+    }
+
+    if(ui->lineEdit_IMEI->text().length() != 15){
+        QMessageBox::information(this, QString("小安提示"),QString("请输入正确的IMEI号码！\n"));
+        return;
+    }
+
     QString url = "http://" + ui->lineEdit_IP->text().toLatin1() +
                   ":"+ui->lineEdit_port->text().toLatin1() +
                   "/v1/device";
@@ -207,6 +237,16 @@ void MainWindow::on_pushButton_GSM_clicked()
 
 void MainWindow::on_pushButton_LOG_clicked()
 {
+    if(ui->lineEdit_IMEI->text().isEmpty()){
+        QMessageBox::information(this, QString("小安提示"),QString("请输入IMEI号码！\n"));
+        return;
+    }
+
+    if(ui->lineEdit_IMEI->text().length() != 15){
+        QMessageBox::information(this, QString("小安提示"),QString("请输入正确的IMEI号码！\n"));
+        return;
+    }
+
     QString url = "http://" + ui->lineEdit_IP->text().toLatin1() +
                   ":"+ui->lineEdit_port->text().toLatin1() +
                   "/v1/device";
@@ -232,6 +272,16 @@ void MainWindow::on_pushButton_LOG_clicked()
 
 void MainWindow::on_pushButton_SETTING_clicked()
 {
+    if(ui->lineEdit_IMEI->text().isEmpty()){
+        QMessageBox::information(this, QString("小安提示"),QString("请输入IMEI号码！\n"));
+        return;
+    }
+
+    if(ui->lineEdit_IMEI->text().length() != 15){
+        QMessageBox::information(this, QString("小安提示"),QString("请输入正确的IMEI号码！\n"));
+        return;
+    }
+
     QString url = "http://" + ui->lineEdit_IP->text().toLatin1() +
                   ":"+ui->lineEdit_port->text().toLatin1() +
                   "/v1/device";
@@ -278,6 +328,16 @@ void MainWindow::on_pushButton_SETTING_clicked()
 
 void MainWindow::on_pushButton_BATTERY_clicked()
 {
+    if(ui->lineEdit_IMEI->text().isEmpty()){
+        QMessageBox::information(this, QString("小安提示"),QString("请输入IMEI号码！\n"));
+        return;
+    }
+
+    if(ui->lineEdit_IMEI->text().length() != 15){
+        QMessageBox::information(this, QString("小安提示"),QString("请输入正确的IMEI号码！\n"));
+        return;
+    }
+
     QString url = "http://" + ui->lineEdit_IP->text().toLatin1() +
                   ":"+ui->lineEdit_port->text().toLatin1() +
                   "/v1/device";
@@ -302,6 +362,16 @@ void MainWindow::on_pushButton_BATTERY_clicked()
 
 void MainWindow::on_pushButton_REBOOT_clicked()
 {
+    if(ui->lineEdit_IMEI->text().isEmpty()){
+        QMessageBox::information(this, QString("小安提示"),QString("请输入IMEI号码！\n"));
+        return;
+    }
+
+    if(ui->lineEdit_IMEI->text().length() != 15){
+        QMessageBox::information(this, QString("小安提示"),QString("请输入正确的IMEI号码！\n"));
+        return;
+    }
+
     QString url = "http://" + ui->lineEdit_IP->text().toLatin1() +
                   ":"+ui->lineEdit_port->text().toLatin1() +
                   "/v1/device";
@@ -315,6 +385,16 @@ void MainWindow::on_pushButton_REBOOT_clicked()
 
 void MainWindow::on_pushButton_UPGRADE_clicked()
 {
+    if(ui->lineEdit_IMEI->text().isEmpty()){
+        QMessageBox::information(this, QString("小安提示"),QString("请输入IMEI号码！\n"));
+        return;
+    }
+
+    if(ui->lineEdit_IMEI->text().length() != 15){
+        QMessageBox::information(this, QString("小安提示"),QString("请输入正确的IMEI号码！\n"));
+        return;
+    }
+
     QMessageBox::information(this, QString("小安提示"),QString("此功能目前不支持\n"));
 }
 

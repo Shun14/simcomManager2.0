@@ -145,7 +145,7 @@ void Dialog_deviceList::findDeviceStatuswithRow(const int row){
         int state = object.take("state").toInt();
 
         if(state){
-            ui->tableWidget->setItem(row,2,new QTableWidgetItem("在线"));
+            ui->tableWidget->setItem(row,2,new QTableWidgetItem("在   线"));
             ui->tableWidget->item(row, 2)->setForeground(Qt::green);
         }
         else{
@@ -183,6 +183,10 @@ void Dialog_deviceList::findDeviceStatuswithRow(const int row){
 
         int course = object.take("course").toInt();
         ui->tableWidget->setItem(row,8,new QTableWidgetItem(QString("%1").arg(course)));
+        if(!isFirst){
+            isFirst = true;
+            ui->tableWidget->resizeColumnsToContents();
+        }
     }
     else{
         ui->tableWidget->setItem(row,1,new QTableWidgetItem(QString("-")));
@@ -194,8 +198,6 @@ void Dialog_deviceList::findDeviceStatuswithRow(const int row){
         ui->tableWidget->setItem(row,7,new QTableWidgetItem(QString("-")));
         ui->tableWidget->setItem(row,8,new QTableWidgetItem(QString("-")));
     }
-    ui->tableWidget->resizeColumnsToContents();
-
 }
 
 QString Dialog_deviceList::httpsOperarte(const QString &url, const QString &data, const QString &type)

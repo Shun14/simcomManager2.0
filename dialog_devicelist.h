@@ -20,6 +20,7 @@ public:
 private:
     Ui::Dialog_deviceList *ui;
     bool isLoading = false;
+    bool isFirst = false;
     void findDeviceStatuswithRow(const int row);
 
 private slots:

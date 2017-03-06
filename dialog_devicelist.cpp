@@ -20,6 +20,7 @@ Dialog_deviceList::Dialog_deviceList(QWidget *parent) :
     ui->setupUi(this);
     this->setWindowTitle("小安宝设备查询软件");
     connect(ui->tableWidget->horizontalHeader(), SIGNAL(sectionClicked(int)), this, SLOT(slotHeaderClicked(int)));
+    qDebug()<<"Dialog_deviceList";
 }
 
 Dialog_deviceList::~Dialog_deviceList()
@@ -86,7 +87,7 @@ void Dialog_deviceList::on_pushButton_ReadFile_clicked()
 void Dialog_deviceList::on_pushButton_StartLoad_clicked()
 {
     static int row = 0;
-
+    qDebug()<<"on_pushButton_StartLoad_clicked";
     if(!isLoading && ui->tableWidget->rowCount() != 0)
     {
         isLoading = true;
@@ -173,16 +174,31 @@ void Dialog_deviceList::findDeviceStatuswithRow(const int row){
         else{
             ui->tableWidget->item(row, 5)->setBackground(Qt::red);
         }
+
+        int MAX_GSM = object.take("MAXGSM").toInt();
+        QTableWidgetItem *item_MAXGSM = new QTableWidgetItem;
+        item_MAXGSM->setData(Qt::DisplayRole, MAX_GSM);
+        ui->tableWidget->setItem(row, 6, item_MAXGSM);
+        if(MAX_GSM >= 20){
+            ui->tableWidget->item(row, 6)->setBackground(Qt::green);
+        }
+        else if(MAX_GSM >= 10){
+            ui->tableWidget->item(row, 6)->setBackground(Qt::yellow);
+        }
+        else{
+            ui->tableWidget->item(row, 6)->setBackground(Qt::red);
+        }
+
         int voltage = object.take("voltage").toInt();
         QTableWidgetItem *item_voltage = new QTableWidgetItem;
         item_voltage->setData(Qt::DisplayRole, voltage);
-        ui->tableWidget->setItem(row, 6, item_voltage);
+        ui->tableWidget->setItem(row, 7, item_voltage);
 
         int speed = object.take("speed").toInt();
-        ui->tableWidget->setItem(row,7,new QTableWidgetItem(QString("%1").arg(speed)));
+        ui->tableWidget->setItem(row,8,new QTableWidgetItem(QString("%1").arg(speed)));
 
         int course = object.take("course").toInt();
-        ui->tableWidget->setItem(row,8,new QTableWidgetItem(QString("%1").arg(course)));
+        ui->tableWidget->setItem(row,9,new QTableWidgetItem(QString("%1").arg(course)));
         if(!isFirst){
             isFirst = true;
             ui->tableWidget->resizeColumnsToContents();

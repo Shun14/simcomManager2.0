@@ -18,9 +18,7 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     this->setWindowTitle("小安宝设备查询软件");
-    this->setMaximumSize(289,517);
-    this->setMinimumSize(289,517);
-    setWindowIcon(QIcon(" xiaoanbao.ico"));    
+    setWindowIcon(QIcon(" xiaoanbao.ico"));
 }
 
 MainWindow::~MainWindow()
@@ -88,6 +86,7 @@ void MainWindow::on_pushButton_findDevice_clicked()
         double lon = object.take("longitude").toDouble();
         ui->tableWidget_deviceState->setItem(4,0,new QTableWidgetItem(QString("%1,  %2").arg(lat).arg(lon)));
 
+
         int GSM = object.take("GSM").toInt();
         ui->tableWidget_deviceState->setItem(5,0,new QTableWidgetItem(QString("%1").arg(GSM)));
         if(GSM > 20){
@@ -100,14 +99,26 @@ void MainWindow::on_pushButton_findDevice_clicked()
             ui->tableWidget_deviceState->item(5, 0)->setBackground(Qt::red);
         }
 
+        int MAX_GSM = object.take("MAXGSM").toInt();
+        ui->tableWidget_deviceState->setItem(6,0,new QTableWidgetItem(QString("%1").arg(MAX_GSM)));
+        if(MAX_GSM > 20){
+            ui->tableWidget_deviceState->item(6, 0)->setBackground(Qt::green);
+        }
+        else if(MAX_GSM > 10){
+            ui->tableWidget_deviceState->item(6, 0)->setBackground(Qt::yellow);
+        }
+        else{
+            ui->tableWidget_deviceState->item(6, 0)->setBackground(Qt::red);
+        }
+
         int voltage = object.take("voltage").toInt();
-        ui->tableWidget_deviceState->setItem(6,0,new QTableWidgetItem(QString("%1").arg(voltage)));
+        ui->tableWidget_deviceState->setItem(7,0,new QTableWidgetItem(QString("%1").arg(voltage)));
 
         int speed = object.take("speed").toInt();
-        ui->tableWidget_deviceState->setItem(7,0,new QTableWidgetItem(QString("%1").arg(speed)));
+        ui->tableWidget_deviceState->setItem(8,0,new QTableWidgetItem(QString("%1").arg(speed)));
 
         int course = object.take("course").toInt();
-        ui->tableWidget_deviceState->setItem(8,0,new QTableWidgetItem(QString("%1").arg(course)));
+        ui->tableWidget_deviceState->setItem(9,0,new QTableWidgetItem(QString("%1").arg(course)));
     }
     else{
         ui->tableWidget_deviceState->setItem(1,0,new QTableWidgetItem(QString("-")));
@@ -118,6 +129,7 @@ void MainWindow::on_pushButton_findDevice_clicked()
         ui->tableWidget_deviceState->setItem(6,0,new QTableWidgetItem(QString("-")));
         ui->tableWidget_deviceState->setItem(7,0,new QTableWidgetItem(QString("-")));
         ui->tableWidget_deviceState->setItem(8,0,new QTableWidgetItem(QString("-")));
+        ui->tableWidget_deviceState->setItem(9,0,new QTableWidgetItem(QString("-")));
     }
     ui->tableWidget_deviceState->resizeColumnsToContents();
 }
@@ -139,7 +151,6 @@ void MainWindow::on_pushButton_FindDeviceLog_clicked()
     {
         return;
     }
-    ui->label_findLog->setText("正在查询，请稍后...");
     QString starttime = QString::number(eventtime.starttime.toTime_t());
     QString endtime = QString::number(eventtime.endtime.toTime_t());
 
@@ -155,7 +166,6 @@ void MainWindow::on_pushButton_FindDeviceLog_clicked()
         Dialog_deviceLog event(this, result);
         event.exec();
     }
-    ui->label_findLog->setText("");
 }
 
 void MainWindow::on_pushButton_FindDeviceList_clicked()

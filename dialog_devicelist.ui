@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>705</width>
+    <width>768</width>
     <height>438</height>
    </rect>
   </property>
@@ -18,7 +18,7 @@
     <rect>
      <x>9</x>
      <y>9</y>
-     <width>691</width>
+     <width>751</width>
      <height>361</height>
     </rect>
    </property>
@@ -54,6 +54,11 @@
    </column>
    <column>
     <property name="text">
+     <string>MAXGSM</string>
+    </property>
+   </column>
+   <column>
+    <property name="text">
      <string>电压值</string>
     </property>
    </column>
@@ -71,8 +76,8 @@
   <widget class="QPushButton" name="pushButton_ReadFile">
    <property name="geometry">
     <rect>
-     <x>120</x>
-     <y>380</y>
+     <x>170</x>
+     <y>377</y>
      <width>121</width>
      <height>51</height>
     </rect>
@@ -92,8 +97,8 @@
   <widget class="QPushButton" name="pushButton_StartLoad">
    <property name="geometry">
     <rect>
-     <x>430</x>
-     <y>383</y>
+     <x>480</x>
+     <y>380</y>
      <width>121</width>
      <height>51</height>
     </rect>

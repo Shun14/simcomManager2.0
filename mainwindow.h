@@ -16,6 +16,8 @@ public:
     ~MainWindow();
     QString httpsOperarte(const QString &url, const QString &data, const QString &type);
     Ui::MainWindow *ui;
+    double lon;
+    double lat;
 
 private:
 
@@ -30,6 +32,7 @@ private slots:
     void on_pushButton_REBOOT_clicked();
     void on_pushButton_UPGRADE_clicked();
     void on_pushButton_FindDeviceList_clicked();
+    void on_tableWidget_deviceState_cellDoubleClicked(int row, int column);
 
 };
 

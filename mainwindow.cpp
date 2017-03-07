@@ -3,6 +3,7 @@
 #include "dialog_findlog.h"
 #include "dialog_devicelog.h"
 #include "dialog_devicelist.h"
+#include "dialog_baidumap.h"
 
 #include <QtNetwork>
 #include <QMessageBox>
@@ -82,9 +83,9 @@ void MainWindow::on_pushButton_findDevice_clicked()
         QDateTime time = QDateTime::fromTime_t(object.take("timestamp").toInt());
         ui->tableWidget_deviceState->setItem(3,0,new QTableWidgetItem(time.toString("yyyy.MM.dd hh:mm:ss dddd")));
 
-        double lat = object.take("latitude").toDouble();
-        double lon = object.take("longitude").toDouble();
-        ui->tableWidget_deviceState->setItem(4,0,new QTableWidgetItem(QString("%1,  %2").arg(lat).arg(lon)));
+        lat = object.take("latitude").toDouble();
+        lon = object.take("longitude").toDouble();
+        ui->tableWidget_deviceState->setItem(4,0,new QTableWidgetItem(QString::number(lat, 10, 6) + ","+ QString::number(lon, 10, 6)));
 
 
         int GSM = object.take("GSM").toInt();
@@ -406,6 +407,20 @@ void MainWindow::on_pushButton_UPGRADE_clicked()
     }
 
     QMessageBox::information(this, QString("小安提示"),QString("此功能目前不支持\n"));
+}
+
+void MainWindow::on_tableWidget_deviceState_cellDoubleClicked(int row, int column)
+{
+    qDebug() << "tableWidget_deviceState_cellDoubleClicked:" << row << column;
+    if(row == 4){
+        if(lat != 0 && lon != 0){
+            Dialog_baiduMap baidu(this);
+            baidu.exec();
+        }
+        else{
+            QMessageBox::information(this, QString("小安提示"),QString("设备未定位"));
+        }
+    }
 }
 
 QString MainWindow::httpsOperarte(const QString &url, const QString &data, const QString &type)

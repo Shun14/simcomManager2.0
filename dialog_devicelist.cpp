@@ -159,7 +159,7 @@ void Dialog_deviceList::findDeviceStatuswithRow(const int row){
 
         double lat = object.take("latitude").toDouble();
         double lon = object.take("longitude").toDouble();
-        ui->tableWidget->setItem(row,4,new QTableWidgetItem(QString("%1,  %2").arg(lat).arg(lon)));
+        ui->tableWidget->setItem(row,4,new QTableWidgetItem(QString::number(lat, 10, 6) + "," + QString::number(lon, 10, 6)));
 
         int GSM = object.take("GSM").toInt();
         QTableWidgetItem *item_GSM = new QTableWidgetItem;

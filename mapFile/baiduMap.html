@@ -27,12 +27,11 @@
  
     // 用经纬度设置地图中心点
     function showAddress(longitude,latitude){
-        var gpsPoint = new BMap.Point(114.425552,30.513571);
+        var gpsPoint = new BMap.Point(longitude,latitude);
         BMap.Convertor.translate(gpsPoint,0,translateCallback);
     }
     
 	var map = new BMap.Map("allmap");
     map.enableScrollWheelZoom(true);
-    showAddress(114.425552,30.513571);
 
 </script>

@@ -7,6 +7,7 @@
 		#allmap{height:100%;width:100%;}
 	</style>
 	<script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=dRjIW743UsWYX4zqC9WooaW6tj0CeG6D"></script>
+    <script type="text/javascript" src="http://developer.baidu.com/map/jsdemo/demo/convertor.js"></script>
 	<title>小安宝查询软件</title>
 </head>
 <body>
@@ -14,25 +15,24 @@
 </body>
 </html>
 <script type="text/javascript">
-	// 百度地图API功能
-	var map = new BMap.Map("allmap");
-    var longitude = 114.425552;
-    var latitude = 30.513571;
-    var Point = new BMap.Point(longitude, latitude);
-
-	map.centerAndZoom(Point,17);
-	map.enableScrollWheelZoom(true);
-    
-    var marker = new BMap.Marker(Point);  // 创建标注
-    map.addOverlay(marker);              // 将标注添加到地图中
-    map.panTo(Point);      
-
+    //坐标转换完之后的回调函数
+    function translateCallback(point){
+        var point = new BMap.Point(point.lng,point.lat);
+        var marker = new BMap.Marker(point);  // 创建标注
+        map.clearOverlays();
+        map.centerAndZoom(point,17);
+        map.addOverlay(marker);              // 将标注添加到地图中
+        map.panTo(point);      
+    }    
+ 
     // 用经纬度设置地图中心点
     function showAddress(longitude,latitude){
-        map.clearOverlays(); 
-        Point = new BMap.Point(longitude,latitude);
-        marker = new BMap.Marker(Point);  // 创建标注
-        map.addOverlay(marker);              // 将标注添加到地图中
-        map.panTo(Point);      
+        var gpsPoint = new BMap.Point(114.425552,30.513571);
+        BMap.Convertor.translate(gpsPoint,0,translateCallback);
     }
+    
+	var map = new BMap.Map("allmap");
+    map.enableScrollWheelZoom(true);
+    showAddress(114.425552,30.513571);
+
 </script>

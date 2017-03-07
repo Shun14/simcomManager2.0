@@ -12,6 +12,7 @@
 #include <QJsonArray>
 #include <QMenu>
 #include <QInputDialog>
+#include <QStringList>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -83,8 +84,8 @@ void MainWindow::on_pushButton_findDevice_clicked()
         QDateTime time = QDateTime::fromTime_t(object.take("timestamp").toInt());
         ui->tableWidget_deviceState->setItem(3,0,new QTableWidgetItem(time.toString("yyyy.MM.dd hh:mm:ss dddd")));
 
-        lat = object.take("latitude").toDouble();
-        lon = object.take("longitude").toDouble();
+        double lat = object.take("latitude").toDouble();
+        double lon = object.take("longitude").toDouble();
         ui->tableWidget_deviceState->setItem(4,0,new QTableWidgetItem(QString::number(lat, 10, 6) + ","+ QString::number(lon, 10, 6)));
 
 
@@ -115,11 +116,11 @@ void MainWindow::on_pushButton_findDevice_clicked()
         int voltage = object.take("voltage").toInt();
         ui->tableWidget_deviceState->setItem(7,0,new QTableWidgetItem(QString("%1").arg(voltage)));
 
-        int speed = object.take("speed").toInt();
-        ui->tableWidget_deviceState->setItem(8,0,new QTableWidgetItem(QString("%1").arg(speed)));
-
         int course = object.take("course").toInt();
-        ui->tableWidget_deviceState->setItem(9,0,new QTableWidgetItem(QString("%1").arg(course)));
+        ui->tableWidget_deviceState->setItem(8,0,new QTableWidgetItem(QString("%1").arg(course)));
+
+        int speed = object.take("speed").toInt();
+        ui->tableWidget_deviceState->setItem(9,0,new QTableWidgetItem(QString("%1").arg(speed)));
     }
     else{
         ui->tableWidget_deviceState->setItem(1,0,new QTableWidgetItem(QString("-")));
@@ -412,14 +413,13 @@ void MainWindow::on_pushButton_UPGRADE_clicked()
 void MainWindow::on_tableWidget_deviceState_cellDoubleClicked(int row, int column)
 {
     qDebug() << "tableWidget_deviceState_cellDoubleClicked:" << row << column;
-    if(row == 4){
-        if(lat != 0 && lon != 0){
-            Dialog_baiduMap baidu(this);
-            baidu.exec();
-        }
-        else{
-            QMessageBox::information(this, QString("小安提示"),QString("设备未定位"));
-        }
+    QString point = ui->tableWidget_deviceState->item(4,0)->text();
+    QStringList sl = point.split(",");
+    if(point.length() >= 2){
+        double lon = sl.last().toDouble();
+        double lat = sl.first().toDouble();
+        Dialog_baiduMap baidu(this, lon, lat);
+        baidu.exec();
     }
 }
 

@@ -8,14 +8,15 @@
 #include <QWebFrame>
 #include <QTextCodec>
 
-Dialog_baiduMap::Dialog_baiduMap(QWidget *parent) :
+Dialog_baiduMap::Dialog_baiduMap(QWidget *parent, double longitude, double latitude) :
     QDialog(parent),
     ui(new Ui::Dialog_baiduMap)
 {
     ui->setupUi(this);
     connect(ui->webView->page()->mainFrame(), SIGNAL(loadFinished(bool)),this, SLOT(baiduMapLoadFinish()));
-
     ui->webView->page()->mainFrame()->addToJavaScriptWindowObject("ReinforcePC", this);
+    lat = latitude;
+    lon = longitude;
 
     QString filePath = QFileInfo("./mapFile/baiduMap.html").absoluteFilePath();
     QUrl url = "file:///" + filePath;
@@ -33,6 +34,6 @@ Dialog_baiduMap::~Dialog_baiduMap()
 void Dialog_baiduMap::baiduMapLoadFinish()
 {
     MainWindow *ptr = (MainWindow*)parentWidget();
-    QString cmd = QString("showAddress(\"%1\",\"%2\")").arg(ptr->lon).arg(ptr->lat);
+    QString cmd = QString("showAddress(\"%1\",\"%2\")").arg(lon).arg(lat);
     ui->webView->page()->mainFrame()->evaluateJavaScript(cmd);
 }

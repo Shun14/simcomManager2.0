@@ -12,11 +12,13 @@ class Dialog_baiduMap : public QDialog
     Q_OBJECT
 
 public:
-    explicit Dialog_baiduMap(QWidget *parent = 0);
+    explicit Dialog_baiduMap(QWidget *parent, double lon, double lat);
     ~Dialog_baiduMap();
 
 private:
     Ui::Dialog_baiduMap *ui;
+    double lat;
+    double lon;
 
 private slots:
     void baiduMapLoadFinish();

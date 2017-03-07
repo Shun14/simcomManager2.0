@@ -16,8 +16,6 @@ public:
     ~MainWindow();
     QString httpsOperarte(const QString &url, const QString &data, const QString &type);
     Ui::MainWindow *ui;
-    double lon;
-    double lat;
 
 private:
 

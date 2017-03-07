@@ -194,11 +194,12 @@ void Dialog_deviceList::findDeviceStatuswithRow(const int row){
         item_voltage->setData(Qt::DisplayRole, voltage);
         ui->tableWidget->setItem(row, 7, item_voltage);
 
-        int speed = object.take("speed").toInt();
-        ui->tableWidget->setItem(row,8,new QTableWidgetItem(QString("%1").arg(speed)));
-
         int course = object.take("course").toInt();
-        ui->tableWidget->setItem(row,9,new QTableWidgetItem(QString("%1").arg(course)));
+        ui->tableWidget->setItem(row,8,new QTableWidgetItem(QString("%1").arg(course)));
+
+        int speed = object.take("speed").toInt();
+        ui->tableWidget->setItem(row,9,new QTableWidgetItem(QString("%1").arg(speed)));
+
         if(!isFirst){
             isFirst = true;
             ui->tableWidget->resizeColumnsToContents();

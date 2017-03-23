@@ -15,10 +15,11 @@ class Dialog_deviceList : public QDialog
 public:
     explicit Dialog_deviceList(QWidget *parent = 0);
     ~Dialog_deviceList();
-    QString httpsOperarte(const QString &url, const QString &data, const QString &type);
+    QString httpOperarte(const QString &url, const QString &data, const QString &type);
 
 private:
     Ui::Dialog_deviceList *ui;
+    int row = 0;
     bool isLoading = false;
     bool isFirst = false;
     void findDeviceStatuswithRow(const int row);
@@ -28,6 +29,7 @@ private slots:
     void on_pushButton_ReadFile_clicked();
     void slotHeaderClicked(int column);
     void keyPressEvent(QKeyEvent *event);
+    void on_tableWidget_cellDoubleClicked(int row, int column);
 };
 
 #endif // DIALOG_DEVICELIST_H

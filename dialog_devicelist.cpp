@@ -1,6 +1,7 @@
 #include "dialog_devicelist.h"
 #include "ui_dialog_devicelist.h"
 #include "mainwindow.h"
+#include "dialog_baidumap.h"
 #include "ui_mainwindow.h"
 
 #include <QtNetwork>
@@ -79,6 +80,8 @@ void Dialog_deviceList::on_pushButton_ReadFile_clicked()
             ui->tableWidget->item(rowNum, 0)->setForeground(Qt::blue);
         }
         ui->tableWidget->resizeColumnsToContents();
+        row = 0;
+        isFirst = false;
 
         file.close();
     }
@@ -86,7 +89,6 @@ void Dialog_deviceList::on_pushButton_ReadFile_clicked()
 
 void Dialog_deviceList::on_pushButton_StartLoad_clicked()
 {
-    static int row = 0;
     qDebug()<<"on_pushButton_StartLoad_clicked";
     if(!isLoading && ui->tableWidget->rowCount() != 0)
     {
@@ -121,7 +123,7 @@ void Dialog_deviceList::findDeviceStatuswithRow(const int row){
                   "/v1/imeiData/" + imeiString;
     qDebug()<<url;
 
-    QString result = httpsOperarte(url, NULL, "GET");
+    QString result = httpOperarte(url, NULL, "GET");
     qDebug()<<result;
     if(result.isEmpty()){
         return;
@@ -217,7 +219,23 @@ void Dialog_deviceList::findDeviceStatuswithRow(const int row){
     }
 }
 
-QString Dialog_deviceList::httpsOperarte(const QString &url, const QString &data, const QString &type)
+void Dialog_deviceList::on_tableWidget_cellDoubleClicked(int row, int column)
+{
+    qDebug() << "tableWidget_deviceState_cellDoubleClicked:" << row << column;
+    QString point = ui->tableWidget->item(row,4)->text();
+    if(point.isEmpty()){
+        return;
+    }
+    QStringList sl = point.split(",");
+    if(point.length() >= 2){
+        double lon = sl.last().toDouble();
+        double lat = sl.first().toDouble();
+        Dialog_baiduMap baidu(this, lon, lat);
+        baidu.exec();
+    }
+}
+
+QString Dialog_deviceList::httpOperarte(const QString &url, const QString &data, const QString &type)
 {
     QNetworkRequest _request;
     _request.setUrl(QUrl(url));
@@ -260,11 +278,14 @@ QString Dialog_deviceList::httpsOperarte(const QString &url, const QString &data
     }
 
     QString _result;
-    if (!_timeout && _reply->error() == QNetworkReply::NoError){
-        _result = _reply->readAll();
+    if(_reply->error() != QNetworkReply::NoError){
+        QMessageBox::information(this, QString("小安提示"), QString("%1\r\n访问失败：%2\r\n").arg(url).arg(_reply->error()));
     }
-    else{
-        QMessageBox::information(this, QString("小安提示"),QString("访问失败：") + QString::number(_reply->error()) + "!\n");
+    else if(_timeout){
+        QMessageBox::information(this, QString("小安提示"), QString("%1\r\n设备无响应\r\n").arg(url));
+    }
+    else {
+        _result = _reply->readAll();
     }
     _reply->deleteLater();
 

@@ -484,7 +484,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="pushButton_UPGRADE">
+       <widget class="QPushButton" name="pushButton_DELETE">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
           <horstretch>0</horstretch>
@@ -504,7 +504,21 @@
          </size>
         </property>
         <property name="text">
+         <string>delete</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="pushButton_UPGRADE">
+        <property name="text">
          <string>upgrade</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="pushButton_SERVER">
+        <property name="text">
+         <string>server</string>
         </property>
        </widget>
       </item>

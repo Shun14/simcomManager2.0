@@ -3,6 +3,7 @@
 #include "mainwindow.h"
 #include "dialog_baidumap.h"
 #include "ui_mainwindow.h"
+#include "http_operate.h"
 
 #include <QtNetwork>
 #include <QMessageBox>
@@ -13,6 +14,7 @@
 #include <QInputDialog>
 #include <QFileDialog>
 #include <QStandardItem>
+#include <QTextEdit>
 
 Dialog_deviceList::Dialog_deviceList(QWidget *parent) :
     QDialog(parent),
@@ -90,7 +92,11 @@ void Dialog_deviceList::on_pushButton_ReadFile_clicked()
 void Dialog_deviceList::on_pushButton_StartLoad_clicked()
 {
     qDebug()<<"on_pushButton_StartLoad_clicked";
-    if(!isLoading && ui->tableWidget->rowCount() != 0)
+    if(ui->tableWidget->rowCount() == 0){
+        QMessageBox::information(this, QString("小安提示"), QString("请先导入IMEI列表！\n"));
+    }
+
+    if(!isLoading)
     {
         isLoading = true;
         ui->pushButton_StartLoad->setText("停止查询");
@@ -122,8 +128,7 @@ void Dialog_deviceList::findDeviceStatuswithRow(const int row){
                   ":"+ptr->ui->lineEdit_port->text().toLatin1() +
                   "/v1/imeiData/" + imeiString;
     qDebug()<<url;
-
-    QString result = httpOperarte(url, NULL, "GET");
+    QString result = http_operate::instance().httpOperarte(url, NULL, "GET", this);
     qDebug()<<result;
     if(result.isEmpty()){
         return;
@@ -216,12 +221,18 @@ void Dialog_deviceList::findDeviceStatuswithRow(const int row){
         ui->tableWidget->setItem(row,6,new QTableWidgetItem(QString("-")));
         ui->tableWidget->setItem(row,7,new QTableWidgetItem(QString("-")));
         ui->tableWidget->setItem(row,8,new QTableWidgetItem(QString("-")));
+        ui->tableWidget->setItem(row,9,new QTableWidgetItem(QString("-")));
     }
 }
 
 void Dialog_deviceList::on_tableWidget_cellDoubleClicked(int row, int column)
 {
     qDebug() << "tableWidget_deviceState_cellDoubleClicked:" << row << column;
+
+    if(ui->tableWidget->item(row,4) == NULL){
+        return;
+    }
+
     QString point = ui->tableWidget->item(row,4)->text();
     if(point.isEmpty()){
         return;
@@ -235,59 +246,128 @@ void Dialog_deviceList::on_tableWidget_cellDoubleClicked(int row, int column)
     }
 }
 
-QString Dialog_deviceList::httpOperarte(const QString &url, const QString &data, const QString &type)
+void Dialog_deviceList::on_pushButton_ClearData_clicked()
 {
-    QNetworkRequest _request;
-    _request.setUrl(QUrl(url));
-    QSslConfiguration _sslCon = _request.sslConfiguration();
-    _sslCon.setPeerVerifyMode(QSslSocket::VerifyNone);
-    _request.setSslConfiguration(_sslCon);
-    _request.setHeader(QNetworkRequest::ContentTypeHeader, QString("application/json"));
-
-    QNetworkAccessManager m_NtwkAccManager;
-    QNetworkReply *_reply;
-    if(type == "POST"){
-        _reply = m_NtwkAccManager.post(_request, data.toLatin1());
+    QMessageBox message(QMessageBox::Warning, QString("小安提示"),
+                        QString("确定要清除所有设备的数据？\r\n"),
+                        QMessageBox::Yes|QMessageBox::No, NULL);
+    if (message.exec()==QMessageBox::No){
+        return;
     }
 
-    if(type == "GET"){
-        _reply = m_NtwkAccManager.get(_request);
-    }
+    MainWindow *ptr = (MainWindow*)parentWidget();
 
-    if(type == "DELETE"){
-        _reply = m_NtwkAccManager.deleteResource(_request);
-    }
-
-    if(type == "PUT"){
-        _reply = m_NtwkAccManager.put(_request, data.toLatin1());
-    }
-    _reply->ignoreSslErrors();
-
-    QTime _t;
-    _t.start();
-
-    int TIMEOUT = (5 * 1000);
-    bool _timeout = false;
-
-    while (!_reply->isFinished()){
-        QApplication::processEvents();
-        if (_t.elapsed() >= TIMEOUT) {
-            _timeout = true;
-            break;
+    int row = this->ui->tableWidget->rowCount();
+    for(int i = 0; i < row; i++) {
+        if(ui->tableWidget->item(i,0) == NULL){
+            continue;
         }
+        QString imei = ui->tableWidget->item(i,0)->text();
+        QString url = QString("https://api.leancloud.cn/1.1/classes/Bindings?where={\"IMEI\":\"%1\"}")
+                      .arg(imei);
+        qDebug()<<url;
+        QString result = http_operate::instance().httpsOperarteLeancloud(url, NULL, "GET", this);
+        qDebug()<<result;
+        if(result.isEmpty()){
+            return;
+        }
+        QJsonDocument jsonDocument = QJsonDocument::fromJson(result.toLatin1());
+        if( jsonDocument.isNull() ){
+            QMessageBox::information(this, QString("小安提示"),QString("查询Leancloud数据错误\n"));
+            return;
+        }
+        QJsonObject object = jsonDocument.object();
+        QJsonValue results = object.take("results");
+        if(!results.isArray()){
+            QMessageBox::information(this, QString("小安提示"),QString("查询Leancloud数据失败:%1\n").arg(imei));
+            return;
+        }
+        QJsonArray array = results.toArray();
+        for(int i = 0; i < array.size(); i++){
+            QJsonValue obj = array.at(i);
+            if(!obj.isObject()){
+                continue;
+            }
+            QJsonObject tmp = obj.toObject();
+            QJsonValue objectID = tmp.take("objectId");
+            QString objectid = objectID.toString();
+            url = QString("https://api.leancloud.cn/1.1/classes/Bindings/%1").arg(objectid);
+            qDebug()<<url;
+            http_operate http;
+            result = http.httpsOperarteLeancloud(url, NULL, "DELETE", this);
+            if(result.isEmpty()){
+                QMessageBox::information(this, QString("小安提示"),QString("清理Leancloud数据失败：%1\n").arg(objectid));
+                continue;
+            }
+        }
+        url = "http://" + ptr->ui->lineEdit_IP->text().toLatin1() +
+                ":"+ptr->ui->lineEdit_port->text().toLatin1() +
+                "/v1/imeiData/" + imei;
+        qDebug()<< url;
+        result = http_operate::instance().httpOperarte(url, NULL, "DELETE", this);
+        qDebug()<<result;
+
+        if(result.isEmpty()){
+            continue;
+        }
+
+        jsonDocument = QJsonDocument::fromJson(result.toLatin1());
+        if( jsonDocument.isNull() ){
+            qDebug()<< "please check the string "<< result;
+            continue;
+        }
+        object = jsonDocument.object();
+        QJsonValue code = object.take("code");
+        if(code.toInt() != 0){
+            QMessageBox::information(this, QString("小安提示"),QString("清理数据库数据失败\n%1")
+                                     .arg(ui->tableWidget->item(i,0)->text()));
+            continue;
+        }
+        ui->tableWidget->setItem(i,1,new QTableWidgetItem(QString("-")));
+        ui->tableWidget->setItem(i,2,new QTableWidgetItem("已清除"));
+        ui->tableWidget->setItem(i,3,new QTableWidgetItem(QString("-")));
+        ui->tableWidget->setItem(i,4,new QTableWidgetItem(QString("-")));
+        ui->tableWidget->setItem(i,5,new QTableWidgetItem(QString("-")));
+        ui->tableWidget->setItem(i,6,new QTableWidgetItem(QString("-")));
+        ui->tableWidget->setItem(i,7,new QTableWidgetItem(QString("-")));
+        ui->tableWidget->setItem(i,8,new QTableWidgetItem(QString("-")));
+        ui->tableWidget->setItem(i,9,new QTableWidgetItem(QString("-")));
+    }
+}
+
+void Dialog_deviceList::on_pushButton_DeriveFile_clicked()
+{
+    QString filepath = QFileDialog::getSaveFileName (this,tr("导出数据"),"",tr("表格 (*.csv)"));
+
+    QFile file(filepath);
+    if(!file.open(QFile::WriteOnly | QIODevice::Text)){
+        QMessageBox::information(this, QString("小安提示"),QString("导出失败！\n"));
+        return;
     }
 
-    QString _result;
-    if(_reply->error() != QNetworkReply::NoError){
-        QMessageBox::information(this, QString("小安提示"), QString("%1\r\n访问失败：%2\r\n").arg(url).arg(_reply->error()));
-    }
-    else if(_timeout){
-        QMessageBox::information(this, QString("小安提示"), QString("%1\r\n设备无响应\r\n").arg(url));
-    }
-    else {
-        _result = _reply->readAll();
-    }
-    _reply->deleteLater();
+    int row = this->ui->tableWidget->rowCount();
+    int col = this->ui->tableWidget->columnCount();
+    QTextStream stream(&file);
 
-    return _result;
+    qDebug() << filepath << row << col;
+
+    for(int i = 0;i < col;i++){
+        stream << "\"" + this->ui->tableWidget->horizontalHeaderItem(i)->text() + "\"" + ",";
+    }
+    stream << endl;
+
+    for(int i = 0; i < row; i++)
+    {
+        for(int j = 0;j < col; j++){
+            if(this->ui->tableWidget->item(i,j) != NULL){
+                stream << "\"\t" + this->ui->tableWidget->item(i,j)->text() + "\"" + ",";
+            }else{
+                stream << "-,";
+            }
+        }
+        stream << endl;
+    }
+
+    file.close();
+    QMessageBox::information(this, QString("小安提示"),QString("导出成功！\n"));
 }

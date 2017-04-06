@@ -4,6 +4,7 @@
 #include "dialog_devicelog.h"
 #include "dialog_devicelist.h"
 #include "dialog_baidumap.h"
+#include "http_operate.h"
 
 #include <QtNetwork>
 #include <QMessageBox>
@@ -44,8 +45,7 @@ void MainWindow::on_pushButton_findDevice_clicked()
                   ":"+ui->lineEdit_port->text().toLatin1() +
                   "/v1/imeiData/" + ui->lineEdit_IMEI->text().toLatin1();
     qDebug()<<url;
-
-    QString result = httpOperarte(url, NULL, "GET");
+    QString result = http_operate::instance().httpOperarte(url, NULL, "GET", this);
     qDebug()<<result;
     if(result.isEmpty()){
         return;
@@ -148,26 +148,8 @@ void MainWindow::on_pushButton_FindDeviceLog_clicked()
         return;
     }
 
-    Dialog_findLog eventtime(this);
-    if(eventtime.exec() != 0)
-    {
-        return;
-    }
-    QString starttime = QString::number(eventtime.starttime.toTime_t());
-    QString endtime = QString::number(eventtime.endtime.toTime_t());
-
-    QString url = "http://" + ui->lineEdit_IP->text().toLatin1() +
-                  ":"+ui->lineEdit_port->text().toLatin1() +
-                  "/v1/deviceEvent/" + ui->lineEdit_IMEI->text().toLatin1() +
-                  "?start=" + starttime + "&end=" + endtime;
-    qDebug()<<url;
-
-    QString result = httpOperarte(url, NULL, "GET");
-    qDebug()<<result;
-    if(!result.isEmpty()){
-        Dialog_deviceLog event(this, result);
-        event.exec();
-    }
+    Dialog_deviceLog event(this);
+    event.exec();
 }
 
 void MainWindow::on_pushButton_FindDeviceList_clicked()
@@ -195,7 +177,7 @@ void MainWindow::on_pushButton_GPS_clicked()
                   ":"+ui->lineEdit_port->text().toLatin1() +
                   "/v1/device";
     QString data = QString("{\"imei\":\"%1\",\"cmd\":{\"c\":17}}").arg(ui->lineEdit_IMEI->text());
-    QString result = httpOperarte(url, data, "POST");
+    QString result = http_operate::instance().httpOperarte(url, data, "POST", this);
     if(result.isEmpty()){
         return;
     }
@@ -229,7 +211,7 @@ void MainWindow::on_pushButton_GSM_clicked()
                   ":"+ui->lineEdit_port->text().toLatin1() +
                   "/v1/device";
     QString data = QString("{\"imei\":\"%1\",\"cmd\":{\"c\":18}}").arg(ui->lineEdit_IMEI->text());
-    QString result = httpOperarte(url, data, "POST");
+    QString result = http_operate::instance().httpOperarte(url, data, "POST", this);
     if(result.isEmpty()){
         return;
     }
@@ -263,7 +245,7 @@ void MainWindow::on_pushButton_LOG_clicked()
                   ":"+ui->lineEdit_port->text().toLatin1() +
                   "/v1/device";
     QString data = QString("{\"imei\":\"%1\",\"cmd\":{\"c\":20}}").arg(ui->lineEdit_IMEI->text());
-    QString result = httpOperarte(url, data, "POST");
+    QString result = http_operate::instance().httpOperarte(url, data, "POST", this);
     if(result.isEmpty()){
         return;
     }
@@ -298,7 +280,7 @@ void MainWindow::on_pushButton_SETTING_clicked()
                   ":"+ui->lineEdit_port->text().toLatin1() +
                   "/v1/device";
     QString data = QString("{\"imei\":\"%1\",\"cmd\":{\"c\":16}}").arg(ui->lineEdit_IMEI->text());
-    QString result = httpOperarte(url, data, "POST");
+    QString result = http_operate::instance().httpOperarte(url, data, "POST", this);
     if(result.isEmpty()){
         return;
     }
@@ -354,7 +336,7 @@ void MainWindow::on_pushButton_BATTERY_clicked()
                   ":"+ui->lineEdit_port->text().toLatin1() +
                   "/v1/device";
     QString data = QString("{\"imei\":\"%1\",\"cmd\":{\"c\":6}}").arg(ui->lineEdit_IMEI->text());
-    QString result = httpOperarte(url, data, "POST");
+    QString result = http_operate::instance().httpOperarte(url, data, "POST", this);
     if(result.isEmpty()){
         return;
     }
@@ -388,7 +370,7 @@ void MainWindow::on_pushButton_REBOOT_clicked()
                   ":"+ui->lineEdit_port->text().toLatin1() +
                   "/v1/device";
     QString data = QString("{\"imei\":\"%1\",\"cmd\":{\"c\":21}}").arg(ui->lineEdit_IMEI->text());
-    QString result = httpOperarte(url, data, "POST");
+    QString result = http_operate::instance().httpOperarte(url, data, "POST", this);
     if(result.isEmpty()){
         return;
     }
@@ -415,7 +397,7 @@ void MainWindow::on_pushButton_DELETE_clicked()
     }
 
     QString url = QString("https://api.leancloud.cn/1.1/classes/Bindings?where={\"IMEI\":\"%1\"}").arg(ui->lineEdit_IMEI->text());
-    QString result = httpsOperarteLeancloud(url, NULL, "GET");
+    QString result = http_operate::instance().httpsOperarteLeancloud(url, NULL, "GET", this);
     qDebug()<<result;
     if(result.isEmpty()){
         return;
@@ -442,7 +424,7 @@ void MainWindow::on_pushButton_DELETE_clicked()
         QString objectid = objectID.toString();
         url = QString("https://api.leancloud.cn/1.1/classes/Bindings/%1").arg(objectid);
         qDebug()<<url;
-        result = httpsOperarteLeancloud(url, NULL, "DELETE");
+        result = http_operate::instance().httpsOperarteLeancloud(url, NULL, "DELETE", this);
         if(result.isEmpty()){
             QMessageBox::information(this, QString("小安提示"),QString("清理Leancloud数据失败：%1\n").arg(objectid));
             continue;
@@ -452,7 +434,7 @@ void MainWindow::on_pushButton_DELETE_clicked()
             ":"+ui->lineEdit_port->text().toLatin1() +
             "/v1/imeiData/" + ui->lineEdit_IMEI->text();
     qDebug()<< url;
-    result = httpsOperarteLeancloud(url, NULL, "DELETE");
+    result = http_operate::instance().httpOperarte(url, NULL, "DELETE", this);
     if(result.isEmpty()){
         return;
     }
@@ -486,7 +468,7 @@ void MainWindow::on_pushButton_UPGRADE_clicked()
     qDebug()<< url;
     QString data = QString("{\"imei\":\"%1\",\"cmd\":0}").arg(ui->lineEdit_IMEI->text());
 
-    QString result = httpOperarte(url, data, "POST");
+    QString result = http_operate::instance().httpOperarte(url, data, "POST", this);
     if(result.isEmpty()){
         return;
     }
@@ -539,7 +521,7 @@ void MainWindow::on_pushButton_SERVER_clicked()
             .arg(ui->lineEdit_IMEI->text())
             .arg(type)
             .arg(text);
-    QString result = httpOperarte(url, data, "POST");
+    QString result = http_operate::instance().httpOperarte(url, data, "POST", this);
     if(result.isEmpty()){
         return;
     }
@@ -566,6 +548,10 @@ void MainWindow::on_pushButton_SERVER_clicked()
 void MainWindow::on_tableWidget_deviceState_cellDoubleClicked(int row, int column)
 {
     qDebug() << "tableWidget_deviceState_cellDoubleClicked:" << row << column;
+    if(ui->tableWidget_deviceState->item(4,0) == NULL){
+        return;
+    }
+
     QString point = ui->tableWidget_deviceState->item(4,0)->text();
     if(point.isEmpty()){
         return;
@@ -577,127 +563,4 @@ void MainWindow::on_tableWidget_deviceState_cellDoubleClicked(int row, int colum
         Dialog_baiduMap baidu(this, lon, lat);
         baidu.exec();
     }
-}
-
-QString MainWindow::httpOperarte(const QString &url, const QString &data, const QString &type)
-{
-    QNetworkRequest _request;
-    _request.setUrl(QUrl(url));
-    QSslConfiguration _sslCon = _request.sslConfiguration();
-    _sslCon.setPeerVerifyMode(QSslSocket::VerifyNone);
-    _request.setSslConfiguration(_sslCon);
-    _request.setHeader(QNetworkRequest::ContentTypeHeader, QString("application/json"));
-
-    QNetworkAccessManager m_NtwkAccManager;
-    QNetworkReply *_reply;
-    if(type == "POST"){
-        _reply = m_NtwkAccManager.post(_request, data.toLatin1());
-    }
-
-    if(type == "GET"){
-        _reply = m_NtwkAccManager.get(_request);
-    }
-
-    if(type == "DELETE"){
-        _reply = m_NtwkAccManager.deleteResource(_request);
-    }
-
-    if(type == "PUT"){
-        _reply = m_NtwkAccManager.put(_request, data.toLatin1());
-    }
-    _reply->ignoreSslErrors();
-
-    QTime _t;
-    _t.start();
-
-    int TIMEOUT = (5 * 1000);
-    bool _timeout = false;
-
-    while (!_reply->isFinished()){
-        QApplication::processEvents();
-        if (_t.elapsed() >= TIMEOUT) {
-            _timeout = true;
-            break;
-        }
-    }
-
-    QString _result;
-    if(_reply->error() != QNetworkReply::NoError){
-        QMessageBox::information(this, QString("小安提示"), QString("%1\r\n访问失败：%2\r\n").arg(url).arg(_reply->error()));
-    }
-    else if(_timeout){
-        QMessageBox::information(this, QString("小安提示"), QString("%1\r\n设备无响应\r\n").arg(url));
-    }
-    else {
-        _result = _reply->readAll();
-    }
-    _reply->deleteLater();
-
-    return _result;
-}
-
-QString MainWindow::httpsOperarteLeancloud(const QString &url, const QString &data, const QString &type)
-{
-    QNetworkRequest _request;
-
-    _request.setUrl(QUrl(url));
-    QSslConfiguration _sslCon = _request.sslConfiguration();
-    _sslCon.setPeerVerifyMode(QSslSocket::VerifyNone);
-    _request.setSslConfiguration(_sslCon);
-    _request.setHeader(QNetworkRequest::ContentTypeHeader, QString("application/json"));
-    _request.setRawHeader(QByteArray::fromStdString("X-LC-Id"),QByteArray::fromStdString("5wk8ccseci7lnss55xfxdgj9xn77hxg3rppsu16o83fydjjn"));
-    _request.setRawHeader(QByteArray::fromStdString("X-LC-Key"),QByteArray::fromStdString("yovqy5zy16og43zwew8i6qmtkp2y6r9b18zerha0fqi5dqsw"));
-
-    QSslConfiguration conf = _request.sslConfiguration();
-    conf.setPeerVerifyMode(QSslSocket::VerifyNone);
-    conf.setProtocol(QSsl::TlsV1SslV3);
-    _request.setSslConfiguration(conf);
-
-    QNetworkAccessManager m_NtwkAccManager;
-    QNetworkReply *_reply;
-    if(type == "POST"){
-        _reply = m_NtwkAccManager.post(_request, data.toLatin1());
-    }
-
-    if(type == "GET"){
-        _reply = m_NtwkAccManager.get(_request);
-    }
-
-    if(type == "DELETE"){
-        _reply = m_NtwkAccManager.deleteResource(_request);
-    }
-
-    if(type == "PUT"){
-        _reply = m_NtwkAccManager.put(_request, data.toLatin1());
-    }
-    _reply->ignoreSslErrors();
-
-    QTime _t;
-    _t.start();
-
-    int TIMEOUT = (5 * 1000);
-    bool _timeout = false;
-
-    while (!_reply->isFinished()){
-        QApplication::processEvents();
-        if (_t.elapsed() >= TIMEOUT) {
-            _timeout = true;
-            break;
-        }
-    }
-
-    QString _result;
-    if(_reply->error() != QNetworkReply::NoError){
-        QMessageBox::information(this, QString("小安提示"), QString("%1\r\n访问失败：%2\r\n").arg(url).arg(_reply->error()));
-    }
-    else if(_timeout){
-        QMessageBox::information(this, QString("小安提示"), QString("%1\r\n设备无响应\r\n").arg(url));
-    }
-    else {
-        _result = _reply->readAll();
-    }
-
-    _reply->deleteLater();
-
-    return _result;
 }

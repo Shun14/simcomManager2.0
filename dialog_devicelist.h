@@ -15,7 +15,6 @@ class Dialog_deviceList : public QDialog
 public:
     explicit Dialog_deviceList(QWidget *parent = 0);
     ~Dialog_deviceList();
-    QString httpOperarte(const QString &url, const QString &data, const QString &type);
 
 private:
     Ui::Dialog_deviceList *ui;
@@ -30,6 +29,8 @@ private slots:
     void slotHeaderClicked(int column);
     void keyPressEvent(QKeyEvent *event);
     void on_tableWidget_cellDoubleClicked(int row, int column);
+    void on_pushButton_ClearData_clicked();
+    void on_pushButton_DeriveFile_clicked();
 };
 
 #endif // DIALOG_DEVICELIST_H

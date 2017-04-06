@@ -14,8 +14,6 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
-    QString httpOperarte(const QString &url, const QString &data, const QString &type);
-    QString httpsOperarteLeancloud(const QString &url, const QString &data, const QString &type);
     Ui::MainWindow *ui;
 
 private:

@@ -371,3 +371,13 @@ void Dialog_deviceList::on_pushButton_DeriveFile_clicked()
     file.close();
     QMessageBox::information(this, QString("小安提示"),QString("导出成功！\n"));
 }
+
+void Dialog_deviceList::on_checkBox_ClearData_stateChanged(int arg1)
+{
+    if(arg1 != 0){
+        QMessageBox::information(this, QString("小安提示"),QString("已经开启清除历史数据功能！\n"));
+        ui->pushButton_ClearData->setEnabled(true);
+    }else{
+        ui->pushButton_ClearData->setEnabled(false);
+    }
+}

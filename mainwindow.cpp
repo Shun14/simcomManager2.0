@@ -178,6 +178,7 @@ void MainWindow::on_pushButton_GPS_clicked()
                   "/v1/device";
     QString data = QString("{\"imei\":\"%1\",\"cmd\":{\"c\":17}}").arg(ui->lineEdit_IMEI->text());
     QString result = http_operate::instance().httpOperarte(url, data, "POST", this);
+    qDebug()<<result;
     if(result.isEmpty()){
         return;
     }

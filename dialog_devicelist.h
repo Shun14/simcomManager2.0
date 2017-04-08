@@ -31,6 +31,7 @@ private slots:
     void on_tableWidget_cellDoubleClicked(int row, int column);
     void on_pushButton_ClearData_clicked();
     void on_pushButton_DeriveFile_clicked();
+    void on_checkBox_ClearData_stateChanged(int arg1);
 };
 
 #endif // DIALOG_DEVICELIST_H

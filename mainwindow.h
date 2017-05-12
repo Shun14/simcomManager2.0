@@ -1,4 +1,4 @@
-#ifndef MAINWINDOW_H
+﻿#ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
 #include <QMainWindow>
@@ -17,7 +17,9 @@ public:
     Ui::MainWindow *ui;
 
 private:
-
+    QString username;
+    QString passwd;
+    bool isRoot;
 private slots:
     void on_pushButton_FindDeviceLog_clicked();
     void on_pushButton_findDevice_clicked();

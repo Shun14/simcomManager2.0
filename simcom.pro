@@ -20,20 +20,23 @@ SOURCES += main.cpp\
     dialog_devicelog.cpp \
     dialog_devicelist.cpp \
     dialog_baidumap.cpp \
-    http_operate.cpp
+    http_operate.cpp \
+    dialog_adminlogin.cpp
 
 HEADERS  += mainwindow.h \
     dialog_findlog.h \
     dialog_devicelog.h \
     dialog_devicelist.h \
     dialog_baidumap.h \
-    http_operate.h
+    http_operate.h \
+    dialog_adminlogin.h
 
 FORMS    += mainwindow.ui \
     dialog_findlog.ui \
     dialog_devicelog.ui \
     dialog_devicelist.ui \
-    dialog_baidumap.ui
+    dialog_baidumap.ui \
+    dialog_adminlogin.ui
 
 DISTFILES +=
 

@@ -4,6 +4,7 @@
 #include "dialog_devicelog.h"
 #include "dialog_devicelist.h"
 #include "dialog_baidumap.h"
+#include "dialog_adminlogin.h"
 #include "http_operate.h"
 
 #include <QtNetwork>
@@ -21,6 +22,15 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     setWindowIcon(QIcon(" xiaoanbao.ico"));
+    Dialog_adminlogin eventlogin(this);
+    if(eventlogin.exec() != 0){
+        username = eventlogin.username;
+        passwd = eventlogin.passwd;
+        isRoot = eventlogin.isRoot;
+        qDebug()<<username<<":"<<passwd;
+    }
+
+
 }
 
 MainWindow::~MainWindow()
@@ -42,9 +52,10 @@ void MainWindow::on_pushButton_findDevice_clicked()
 
     QString url = "http://" + ui->lineEdit_IP->text().toLatin1() +
                   ":"+ui->lineEdit_port->text().toLatin1() +
-                  "/v1/imeiData/" + ui->lineEdit_IMEI->text().toLatin1();
+                  "/admin/imeiData/" + ui->lineEdit_IMEI->text().toLatin1();
     qDebug()<<url;
-    QString result = http_operate::instance().httpOperarte(url, NULL, "GET", this);
+
+    QString result = http_operate::instance().httpOperarteWithAuth(url, NULL, "GET", username, passwd,this);
     qDebug()<<result;
     if(result.isEmpty()){
         return;
@@ -491,10 +502,10 @@ void MainWindow::on_pushButton_UPGRADE_clicked()
 
     QJsonValue code = object.take("code");
     if(code.toInt() == 0){
-        QMessageBox::information(this, tr("xiaoantishi"),tr("设备正在升级，请稍后确认!"));
+        QMessageBox::information(this, tr("xiaoantishi"),tr("device is upgragding!"));//设备正在升级，请稍后确认!
     }
     else{
-        QMessageBox::information(this, tr("xiaoantishi"),tr("设备升级升级失败!"));
+        QMessageBox::information(this, tr("xiaoantishi"),tr("device upgrade failed!"));//设备升级升级失败!
     }
 }
 
@@ -515,7 +526,7 @@ void MainWindow::on_pushButton_SERVER_clicked()
                   "/v1/device";
     qDebug()<<url;
     bool isOK;
-    QString text = QInputDialog::getText(NULL,QString("xiaoantishi"),"请输入服务器地址：", QLineEdit::Normal,"www.xiaoan110.com:9880",&isOK);
+    QString text = QInputDialog::getText(NULL,QString("xiaoantishi"),tr("Please input the server address:"), QLineEdit::Normal,"www.xiaoan110.com:9880",&isOK);
     if(text.isEmpty() || !isOK){
         return;
     }
@@ -523,7 +534,7 @@ void MainWindow::on_pushButton_SERVER_clicked()
     QRegExp domain(tr("^([a-zA-Z0-9][-a-zA-Z0-9]{0,62})(\\.[a-zA-Z0-9][-a-zA-Z0-9]{0,62})(\\.[a-zA-Z0-9][-a-zA-Z0-9]{0,62})(\\:[0-9]{1,5})$"));
     QRegExp ip(tr("^([0-9]{1,3})(\\.[0-9]{1,3}){3}(\\:[0-9]{1,5})$"));
     if(!domain.exactMatch(text) && !ip.exactMatch(text)){
-        QMessageBox::information(this, tr("xiaoantishi"),tr("服务器地址错误."));
+        QMessageBox::information(this, tr("xiaoantishi"),tr("server address error."));
         return;
     }
     int type = 0;
@@ -545,12 +556,12 @@ void MainWindow::on_pushButton_SERVER_clicked()
 
     QJsonValue code = object.take("code");
     if(code.isUndefined()){
-        QMessageBox::information(this, tr("xiaoantishi"),tr("设置服务器失败."));
+        QMessageBox::information(this, tr("xiaoantishi"),tr("set the server failed."));
         return;
     }
 
     if(code.toInt() == 0 ||code.toInt() == 108 ){
-        QMessageBox::information(this, tr("xiaoantishi"),tr("设置服务器成功."));
+        QMessageBox::information(this, tr("xiaoantishi"),tr("set the server successful."));
     }
 }
 

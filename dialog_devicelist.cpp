@@ -59,7 +59,7 @@ void Dialog_deviceList::keyPressEvent(QKeyEvent *event)
 
 void Dialog_deviceList::on_pushButton_ReadFile_clicked()
 {
-    QString path = QFileDialog::getOpenFileName(this, tr("小安宝设备查询软件"), ".", tr("Text Files(*.txt)"));
+    QString path = QFileDialog::getOpenFileName(this, tr("小安宝设备查询软件"), ".", tr("Text Files(*.txt)"));//小安宝设备查询软件
     if(!path.isEmpty())
     {
         QFile file(path);

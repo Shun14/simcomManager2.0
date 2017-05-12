@@ -1,4 +1,4 @@
-#include "mainwindow.h"
+﻿#include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "dialog_findlog.h"
 #include "dialog_devicelog.h"
@@ -14,13 +14,12 @@
 #include <QMenu>
 #include <QInputDialog>
 #include <QStringList>
-
+#include <QObject>
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    this->setWindowTitle("小安宝设备查询软件");
     setWindowIcon(QIcon(" xiaoanbao.ico"));
 }
 
@@ -32,12 +31,12 @@ MainWindow::~MainWindow()
 void MainWindow::on_pushButton_findDevice_clicked()
 {
     if(ui->lineEdit_IMEI->text().isEmpty()){
-        QMessageBox::information(this, QString("小安提示"),QString("请输入IMEI号码！\n"));
+        QMessageBox::information(this, tr("xiaoantishi"),tr("Please input correct IMEI number!\n"));
         return;
     }
 
     if(ui->lineEdit_IMEI->text().length() != 15){
-        QMessageBox::information(this, QString("小安提示"),QString("请输入正确的IMEI号码！\n"));
+        QMessageBox::information(this, tr("xiaoantishi"),tr("Please input correct IMEI number!\n"));
         return;
     }
 
@@ -124,7 +123,7 @@ void MainWindow::on_pushButton_findDevice_clicked()
     }
     else{
         ui->tableWidget_deviceState->setItem(1,0,new QTableWidgetItem(QString("-")));
-        ui->tableWidget_deviceState->setItem(2,0,new QTableWidgetItem("未登录"));
+        ui->tableWidget_deviceState->setItem(2,0,new QTableWidgetItem(tr("no login")));
         ui->tableWidget_deviceState->setItem(3,0,new QTableWidgetItem(QString("-")));
         ui->tableWidget_deviceState->setItem(4,0,new QTableWidgetItem(QString("-")));
         ui->tableWidget_deviceState->setItem(5,0,new QTableWidgetItem(QString("-")));
@@ -139,12 +138,12 @@ void MainWindow::on_pushButton_findDevice_clicked()
 void MainWindow::on_pushButton_FindDeviceLog_clicked()
 {
     if(ui->lineEdit_IMEI->text().isEmpty()){
-        QMessageBox::information(this, QString("小安提示"),QString("请输入IMEI号码！\n"));
+        QMessageBox::information(this, tr("xiaoantishi"), tr("Please input correct IMEI number!\n"));
         return;
     }
 
     if(ui->lineEdit_IMEI->text().length() != 15){
-        QMessageBox::information(this, QString("小安提示"),QString("请输入正确的IMEI号码！\n"));
+        QMessageBox::information(this, tr("xiaoantishi"),tr("Please input correct IMEI number!\n"));
         return;
     }
 
@@ -164,12 +163,12 @@ void MainWindow::on_pushButton_FindDeviceList_clicked()
 void MainWindow::on_pushButton_GPS_clicked()
 {
     if(ui->lineEdit_IMEI->text().isEmpty()){
-        QMessageBox::information(this, QString("小安提示"),QString("请输入IMEI号码！\n"));
+        QMessageBox::information(this, tr("xiaoantishi"),tr("Please input correct IMEI number!\n"));
         return;
     }
 
     if(ui->lineEdit_IMEI->text().length() != 15){
-        QMessageBox::information(this, QString("小安提示"),QString("请输入正确的IMEI号码！\n"));
+        QMessageBox::information(this, tr("xiaoantishi"),tr("Please input correct IMEI number!\n"));
         return;
     }
 
@@ -188,23 +187,33 @@ void MainWindow::on_pushButton_GPS_clicked()
         return;
     }
     QJsonObject object = jsonDocument.object();
-
     QJsonValue gps = object.take("result");
+
     if(gps.isObject()){
         QJsonObject obj = gps.toObject();
-        QMessageBox::information(this, QString("小安提示"),QString("GPSSignal: ") + QString("%1").arg(obj.take("GPSSignal").toDouble()));
+        qDebug()<<"obj toObject():"<<obj;
+        QString msgGPS;
+        msgGPS = QString("GPSSignal: ") + QString("%1").arg(obj.take("GPSSignal").toDouble())+QString("\n")+
+                QString("satellites: ") + QString("%1").arg(obj.take("satellites").toInt())+QString("\n")+
+                QString("HDOP: ") + QString("%1").arg(obj.take("HDOP").toDouble())+QString("\n")+
+                QString("PDOP: ")+QString("%1").arg(obj.take("PDOP").toDouble())+QString("\n")+
+                QString("VDOP: ") + QString("%1").arg(obj.take("VDOP").toDouble());
+        QMessageBox::information(this, tr("xiaoantishi"),msgGPS);
+
+    } else {
+        QMessageBox::information(this, tr("xiaoantishi"), tr("Server internal error: result's value is empty"));
     }
 }
 
 void MainWindow::on_pushButton_GSM_clicked()
 {
     if(ui->lineEdit_IMEI->text().isEmpty()){
-        QMessageBox::information(this, QString("小安提示"),QString("请输入IMEI号码！\n"));
+        QMessageBox::information(this, tr("xiaoantishi"),tr("Please input correct IMEI number!\n"));
         return;
     }
 
     if(ui->lineEdit_IMEI->text().length() != 15){
-        QMessageBox::information(this, QString("小安提示"),QString("请输入正确的IMEI号码！\n"));
+        QMessageBox::information(this, tr("xiaoantishi"),tr("Please input correct IMEI number!\n"));
         return;
     }
 
@@ -226,19 +235,19 @@ void MainWindow::on_pushButton_GSM_clicked()
     QJsonValue gsm = object.take("result");
     if(gsm.isObject()){
         QJsonObject obj = gsm.toObject();
-        QMessageBox::information(this, QString("小安提示"),QString("GSMSignal: ") + QString("%1").arg(obj.take("GSMSignal").toDouble()));
+        QMessageBox::information(this, tr("xiaoantishi"),QString("GSMSignal: ") + QString("%1").arg(obj.take("GSMSignal").toDouble()));
     }
 }
 
 void MainWindow::on_pushButton_LOG_clicked()
 {
     if(ui->lineEdit_IMEI->text().isEmpty()){
-        QMessageBox::information(this, QString("小安提示"),QString("请输入IMEI号码！\n"));
+        QMessageBox::information(this, tr("xiaoantishi"),tr("Please input correct IMEI number!\n"));
         return;
     }
 
     if(ui->lineEdit_IMEI->text().length() != 15){
-        QMessageBox::information(this, QString("小安提示"),QString("请输入正确的IMEI号码！\n"));
+        QMessageBox::information(this, tr("xiaoantishi"),tr("Please input correct IMEI number!\n"));
         return;
     }
 
@@ -261,19 +270,19 @@ void MainWindow::on_pushButton_LOG_clicked()
     QJsonValue log = object.take("result");
     if(log.isObject()){
         QJsonObject obj = log.toObject();
-        QMessageBox::information(this, QString("小安提示"), obj.take("log").toString());
+        QMessageBox::information(this, tr("xiaoantishi"), obj.take("log").toString());
     }
 }
 
 void MainWindow::on_pushButton_SETTING_clicked()
 {
     if(ui->lineEdit_IMEI->text().isEmpty()){
-        QMessageBox::information(this, QString("小安提示"),QString("请输入IMEI号码！\n"));
+        QMessageBox::information(this, tr("xiaoantishi"),tr("Please input correct IMEI number!\n"));
         return;
     }
 
     if(ui->lineEdit_IMEI->text().length() != 15){
-        QMessageBox::information(this, QString("小安提示"),QString("请输入正确的IMEI号码！\n"));
+        QMessageBox::information(this, tr("xiaoantishi"),tr("Please input correct IMEI number!\n"));
         return;
     }
 
@@ -317,19 +326,19 @@ void MainWindow::on_pushButton_SETTING_clicked()
 
         msg+= "Period: " + QString("%1").arg(autolock.take("period").toInt());
 
-        QMessageBox::information(this, QString("小安提示"),msg);
+        QMessageBox::information(this, tr("xiaoantishi"),msg);
     }
 }
 
 void MainWindow::on_pushButton_BATTERY_clicked()
 {
     if(ui->lineEdit_IMEI->text().isEmpty()){
-        QMessageBox::information(this, QString("小安提示"),QString("请输入IMEI号码！\n"));
+        QMessageBox::information(this, tr("xiaoantishi"),tr("Please input correct IMEI number!\n"));
         return;
     }
 
     if(ui->lineEdit_IMEI->text().length() != 15){
-        QMessageBox::information(this, QString("小安提示"),QString("请输入正确的IMEI号码！\n"));
+        QMessageBox::information(this, tr("xiaoantishi"),tr("Please input correct IMEI number!\n"));
         return;
     }
 
@@ -351,19 +360,19 @@ void MainWindow::on_pushButton_BATTERY_clicked()
     QJsonValue battery = object.take("result");
     if(battery.isObject()){
         QJsonObject obj = battery.toObject();
-        QMessageBox::information(this, QString("小安提示"),QString("percent: ") + QString("%1").arg(obj.take("percent").toInt()));
+        QMessageBox::information(this, tr("xiaoantishi"),QString("percent: ") + QString("%1").arg(obj.take("percent").toInt()));
     }
 }
 
 void MainWindow::on_pushButton_REBOOT_clicked()
 {
     if(ui->lineEdit_IMEI->text().isEmpty()){
-        QMessageBox::information(this, QString("小安提示"),QString("请输入IMEI号码！\n"));
+        QMessageBox::information(this, tr("xiaoantishi"),tr("Please input correct IMEI number!\n"));
         return;
     }
 
     if(ui->lineEdit_IMEI->text().length() != 15){
-        QMessageBox::information(this, QString("小安提示"),QString("请输入正确的IMEI号码！\n"));
+        QMessageBox::information(this, tr("xiaoantishi"),tr("Please input correct IMEI number!\n"));
         return;
     }
 
@@ -375,25 +384,25 @@ void MainWindow::on_pushButton_REBOOT_clicked()
     if(result.isEmpty()){
         return;
     }
-    QMessageBox::information(this, QString("小安提示"),QString("reboot."));
+    QMessageBox::information(this, tr("xiaoantishi"),QString("reboot."));
 }
 
 void MainWindow::on_pushButton_DELETE_clicked()
 {
-    QMessageBox message(QMessageBox::Warning, QString("小安提示"),
-                        QString("确定要清除该设备的数据？\r\n%1").arg(ui->lineEdit_IMEI->text()),
+    QMessageBox message(QMessageBox::Warning, tr("xiaoantishi"),
+                        tr("are you sure you want to delete the device data ?\r\n%1").arg(ui->lineEdit_IMEI->text()),
                         QMessageBox::Yes|QMessageBox::No, NULL);
     if (message.exec()==QMessageBox::No){
         return;
     }
 
     if(ui->lineEdit_IMEI->text().isEmpty()){
-        QMessageBox::information(this, QString("小安提示"),QString("请输入IMEI号码！\n"));
+        QMessageBox::information(this, tr("xiaoantishi"),tr("Please input correct IMEI number!\n"));
         return;
     }
 
     if(ui->lineEdit_IMEI->text().length() != 15){
-        QMessageBox::information(this, QString("小安提示"),QString("请输入正确的IMEI号码！\n"));
+        QMessageBox::information(this, tr("xiaoantishi"),tr("Please input correct IMEI number!\n"));
         return;
     }
 
@@ -405,13 +414,13 @@ void MainWindow::on_pushButton_DELETE_clicked()
     }
     QJsonDocument jsonDocument = QJsonDocument::fromJson(result.toLatin1());
     if( jsonDocument.isNull() ){
-        QMessageBox::information(this, QString("小安提示"),QString("查询Leancloud数据错误\n"));
+        QMessageBox::information(this, tr("xiaoantishi"),tr("looking for Leancloud data error\n"));
         return;
     }
     QJsonObject object = jsonDocument.object();
     QJsonValue results = object.take("results");
     if(!results.isArray()){
-        QMessageBox::information(this, QString("小安提示"),QString("查询Leancloud数据失败:%1\n").arg(ui->lineEdit_IMEI->text()));
+        QMessageBox::information(this, tr("xiaoantishi"),tr("looking for Leancloud data error:")+QString("%1\n").arg(ui->lineEdit_IMEI->text()));
         return;
     }
     QJsonArray array = results.toArray();
@@ -427,7 +436,7 @@ void MainWindow::on_pushButton_DELETE_clicked()
         qDebug()<<url;
         result = http_operate::instance().httpsOperarteLeancloud(url, NULL, "DELETE", this);
         if(result.isEmpty()){
-            QMessageBox::information(this, QString("小安提示"),QString("清理Leancloud数据失败：%1\n").arg(objectid));
+            QMessageBox::information(this, tr("xiaoantishi"),tr("deleting Leancloud data error: %1\n").arg(objectid));
             continue;
         }
     }
@@ -448,17 +457,17 @@ void MainWindow::on_pushButton_DELETE_clicked()
     object = jsonDocument.object();
     QJsonValue code = object.take("code");
     if(code.toInt() != 0){
-        QMessageBox::information(this, QString("小安提示"),QString("清理数据库数据失败\n"));
+        QMessageBox::information(this, tr("xiaoantishi"),tr("deleting databases data error\n"));
         return;
     }
 
-    QMessageBox::information(this, QString("小安提示"),QString("清理数据库数据成功\n"));
+    QMessageBox::information(this, tr("xiaoantishi"),tr("deleting databases data successful\n"));
 }
 
 void MainWindow::on_pushButton_UPGRADE_clicked()
 {
-    QMessageBox message(QMessageBox::Warning, QString("小安提示"),
-                        QString("确定要将该设备立即升到最新版本？\r\n%1").arg(ui->lineEdit_IMEI->text()),
+    QMessageBox message(QMessageBox::Warning, tr("xiaoantishi"),
+                        tr("are you sure update the device to the newest version?\r\n%1").arg(ui->lineEdit_IMEI->text()),
                         QMessageBox::Yes|QMessageBox::No, NULL);
     if (message.exec()==QMessageBox::No){
         return;
@@ -482,22 +491,22 @@ void MainWindow::on_pushButton_UPGRADE_clicked()
 
     QJsonValue code = object.take("code");
     if(code.toInt() == 0){
-        QMessageBox::information(this, QString("小安提示"),QString("设备正在升级，请稍后确认！"));
+        QMessageBox::information(this, tr("xiaoantishi"),tr("设备正在升级，请稍后确认!"));
     }
     else{
-        QMessageBox::information(this, QString("小安提示"),QString("设备升级升级失败！"));
+        QMessageBox::information(this, tr("xiaoantishi"),tr("设备升级升级失败!"));
     }
 }
 
 void MainWindow::on_pushButton_SERVER_clicked()
 {
     if(ui->lineEdit_IMEI->text().isEmpty()){
-        QMessageBox::information(this, QString("小安提示"),QString("请输入IMEI号码！\n"));
+        QMessageBox::information(this, tr("xiaoantishi"),tr("Please input correct IMEI number!\n"));
         return;
     }
 
     if(ui->lineEdit_IMEI->text().length() != 15){
-        QMessageBox::information(this, QString("小安提示"),QString("请输入正确的IMEI号码！\n"));
+        QMessageBox::information(this,tr("xiaoantishi"),tr("Please input correct IMEI number!\n"));
         return;
     }
 
@@ -506,15 +515,15 @@ void MainWindow::on_pushButton_SERVER_clicked()
                   "/v1/device";
     qDebug()<<url;
     bool isOK;
-    QString text = QInputDialog::getText(NULL,"小安提示","请输入服务器地址：", QLineEdit::Normal,"www.xiaoan110.com:9880",&isOK);
+    QString text = QInputDialog::getText(NULL,QString("xiaoantishi"),"请输入服务器地址：", QLineEdit::Normal,"www.xiaoan110.com:9880",&isOK);
     if(text.isEmpty() || !isOK){
         return;
     }
     qDebug()<<text;
-    QRegExp domain(tr("^([a-zA-Z0-9][-a-zA-Z0-9]{0,62})(\.[a-zA-Z0-9][-a-zA-Z0-9]{0,62})(\.[a-zA-Z0-9][-a-zA-Z0-9]{0,62})(\:[0-9]{1,5})$"));
-    QRegExp ip(tr("^([0-9]{1,3})(\.[0-9]{1,3}){3}(\:[0-9]{1,5})$"));
+    QRegExp domain(tr("^([a-zA-Z0-9][-a-zA-Z0-9]{0,62})(\\.[a-zA-Z0-9][-a-zA-Z0-9]{0,62})(\\.[a-zA-Z0-9][-a-zA-Z0-9]{0,62})(\\:[0-9]{1,5})$"));
+    QRegExp ip(tr("^([0-9]{1,3})(\\.[0-9]{1,3}){3}(\\:[0-9]{1,5})$"));
     if(!domain.exactMatch(text) && !ip.exactMatch(text)){
-        QMessageBox::information(this, QString("小安提示"),QString("服务器地址错误."));
+        QMessageBox::information(this, tr("xiaoantishi"),tr("服务器地址错误."));
         return;
     }
     int type = 0;
@@ -536,12 +545,12 @@ void MainWindow::on_pushButton_SERVER_clicked()
 
     QJsonValue code = object.take("code");
     if(code.isUndefined()){
-        QMessageBox::information(this, QString("小安提示"),QString("设置服务器失败."));
+        QMessageBox::information(this, tr("xiaoantishi"),tr("设置服务器失败."));
         return;
     }
 
     if(code.toInt() == 0 ||code.toInt() == 108 ){
-        QMessageBox::information(this, QString("小安提示"),QString("设置服务器成功."));
+        QMessageBox::information(this, tr("xiaoantishi"),tr("设置服务器成功."));
     }
 }
 
@@ -561,6 +570,7 @@ void MainWindow::on_tableWidget_deviceState_cellDoubleClicked(int row, int colum
     if(point.length() >= 2){
         double lon = sl.last().toDouble();
         double lat = sl.first().toDouble();
+        qDebug()<<"next is map:";
         Dialog_baiduMap baidu(this, lon, lat);
         baidu.exec();
     }

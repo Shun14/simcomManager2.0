@@ -8,7 +8,6 @@ Dialog_findLog::Dialog_findLog(QWidget *parent) :
     ui(new Ui::Dialog_findLog)
 {
     ui->setupUi(this);
-    this->setWindowTitle("小安宝设备查询软件");
     QDateTime time = QDateTime::currentDateTime();
     ui->dateTimeEdit_start->setDateTime(time);
     ui->dateTimeEdit_end->setDateTime(time);

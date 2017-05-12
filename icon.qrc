@@ -2,4 +2,7 @@
     <qresource prefix="/new/prefix1">
         <file>xiaoanbao.ico</file>
     </qresource>
+    <qresource prefix="/">
+        <file>en_Zn.qm</file>
+    </qresource>
 </RCC>

@@ -16,8 +16,6 @@ Dialog_deviceLog::Dialog_deviceLog(QWidget *parent) :
     ui(new Ui::Dialog_deviceLog)
 {
     ui->setupUi(this);
-    this->setWindowTitle("小安宝设备查询软件");
-
     MainWindow *ptr = (MainWindow*)parentWidget();
 
     Dialog_findLog eventtime(this);
@@ -63,7 +61,7 @@ void Dialog_deviceLog::on_pushButton_Refresh_clicked()
 {
     MainWindow *ptr = (MainWindow*)parentWidget();
     qDebug()<< "refresh";
-    ui->label_Refresh->setText("正在刷新...");
+    ui->label_Refresh->setText(tr("Refreshing"));
     QString url = "http://" + ptr->ui->lineEdit_IP->text().toLatin1() +
                   ":"+ptr->ui->lineEdit_port->text().toLatin1() +
                   "/v1/deviceEvent/" + ptr->ui->lineEdit_IMEI->text().toLatin1() +
@@ -90,5 +88,5 @@ void Dialog_deviceLog::on_pushButton_Refresh_clicked()
         }
     }
     ui->tableWidget->resizeColumnsToContents();
-    ui->label_Refresh->setText("刷新成功");
+    ui->label_Refresh->setText(tr("refreshing successful"));
 }

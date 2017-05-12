@@ -1,4 +1,4 @@
-#include "dialog_devicelist.h"
+﻿#include "dialog_devicelist.h"
 #include "ui_dialog_devicelist.h"
 #include "mainwindow.h"
 #include "dialog_baidumap.h"
@@ -21,7 +21,6 @@ Dialog_deviceList::Dialog_deviceList(QWidget *parent) :
     ui(new Ui::Dialog_deviceList)
 {
     ui->setupUi(this);
-    this->setWindowTitle("小安宝设备查询软件");
     connect(ui->tableWidget->horizontalHeader(), SIGNAL(sectionClicked(int)), this, SLOT(slotHeaderClicked(int)));
     qDebug()<<"Dialog_deviceList";
 }
@@ -43,7 +42,7 @@ void Dialog_deviceList::keyPressEvent(QKeyEvent *event)
     {
         qDebug() << "get keyPressEvent ctrl+f";
         bool isOK;
-        QString text = QInputDialog::getText(NULL,"小安宝设备查询软件","", QLineEdit::Normal,NULL,&isOK);
+        QString text = QInputDialog::getText(NULL,tr("xiaoantishi"),"", QLineEdit::Normal,NULL,&isOK);
         if(text.isEmpty())return;
         if(ui->tableWidget->findItems(text, Qt::MatchContains).isEmpty()){
             qDebug() << "failed to find:" << text;
@@ -93,13 +92,13 @@ void Dialog_deviceList::on_pushButton_StartLoad_clicked()
 {
     qDebug()<<"on_pushButton_StartLoad_clicked";
     if(ui->tableWidget->rowCount() == 0){
-        QMessageBox::information(this, QString("小安提示"), QString("请先导入IMEI列表！\n"));
+        QMessageBox::information(this, tr("xiaoantishi"), tr("Please input IMEI list firstly\n"));//请先导入IMEI列表!
     }
 
     if(!isLoading)
     {
         isLoading = true;
-        ui->pushButton_StartLoad->setText("停止查询");
+        ui->pushButton_StartLoad->setText(tr("stop finding"));
         for(; row < ui->tableWidget->rowCount() && isLoading ; row++)
         {
             findDeviceStatuswithRow(row);
@@ -108,14 +107,14 @@ void Dialog_deviceList::on_pushButton_StartLoad_clicked()
         if(row == ui->tableWidget->rowCount())
         {
             isLoading = false;
-            ui->pushButton_StartLoad->setText("开始查询");
+            ui->pushButton_StartLoad->setText(tr("start finding"));
         }
     }
     else
     {
         row--;
         isLoading = false;
-        ui->pushButton_StartLoad->setText("继续查询");
+        ui->pushButton_StartLoad->setText(tr("continue finding"));
     }
 }
 
@@ -214,7 +213,7 @@ void Dialog_deviceList::findDeviceStatuswithRow(const int row){
     }
     else{
         ui->tableWidget->setItem(row,1,new QTableWidgetItem(QString("-")));
-        ui->tableWidget->setItem(row,2,new QTableWidgetItem("未登录"));
+        ui->tableWidget->setItem(row,2,new QTableWidgetItem(tr("no login")));
         ui->tableWidget->setItem(row,3,new QTableWidgetItem(QString("-")));
         ui->tableWidget->setItem(row,4,new QTableWidgetItem(QString("-")));
         ui->tableWidget->setItem(row,5,new QTableWidgetItem(QString("-")));
@@ -248,8 +247,8 @@ void Dialog_deviceList::on_tableWidget_cellDoubleClicked(int row, int column)
 
 void Dialog_deviceList::on_pushButton_ClearData_clicked()
 {
-    QMessageBox message(QMessageBox::Warning, QString("小安提示"),
-                        QString("确定要清除所有设备的数据？\r\n"),
+    QMessageBox message(QMessageBox::Warning, tr("xiaoantishi"),
+                        tr("确定要清除所有设备的数据?\r\n"),
                         QMessageBox::Yes|QMessageBox::No, NULL);
     if (message.exec()==QMessageBox::No){
         return;
@@ -273,13 +272,13 @@ void Dialog_deviceList::on_pushButton_ClearData_clicked()
         }
         QJsonDocument jsonDocument = QJsonDocument::fromJson(result.toLatin1());
         if( jsonDocument.isNull() ){
-            QMessageBox::information(this, QString("小安提示"),QString("查询Leancloud数据错误\n"));
+            QMessageBox::information(this, tr("xiaoantishi"),tr("查询Leancloud数据错误\n"));
             return;
         }
         QJsonObject object = jsonDocument.object();
         QJsonValue results = object.take("results");
         if(!results.isArray()){
-            QMessageBox::information(this, QString("小安提示"),QString("查询Leancloud数据失败:%1\n").arg(imei));
+            QMessageBox::information(this, tr("xiaoantishi"),tr("查询Leancloud数据失败:%1\n").arg(imei));
             return;
         }
         QJsonArray array = results.toArray();
@@ -296,7 +295,7 @@ void Dialog_deviceList::on_pushButton_ClearData_clicked()
             http_operate http;
             result = http.httpsOperarteLeancloud(url, NULL, "DELETE", this);
             if(result.isEmpty()){
-                QMessageBox::information(this, QString("小安提示"),QString("清理Leancloud数据失败：%1\n").arg(objectid));
+                QMessageBox::information(this, tr("xiaoantishi"),tr("清理Leancloud数据失败：%1\n").arg(objectid));
                 continue;
             }
         }
@@ -319,7 +318,7 @@ void Dialog_deviceList::on_pushButton_ClearData_clicked()
         object = jsonDocument.object();
         QJsonValue code = object.take("code");
         if(code.toInt() != 0){
-            QMessageBox::information(this, QString("小安提示"),QString("清理数据库数据失败\n%1")
+            QMessageBox::information(this, tr("xiaoantishi"),tr("清理数据库数据失败\n%1")
                                      .arg(ui->tableWidget->item(i,0)->text()));
             continue;
         }
@@ -341,7 +340,7 @@ void Dialog_deviceList::on_pushButton_DeriveFile_clicked()
 
     QFile file(filepath);
     if(!file.open(QFile::WriteOnly | QIODevice::Text)){
-        QMessageBox::information(this, QString("小安提示"),QString("导出失败！\n"));
+        QMessageBox::information(this, tr("xiaoantishi"),tr("导出失败！\n"));
         return;
     }
 
@@ -369,13 +368,13 @@ void Dialog_deviceList::on_pushButton_DeriveFile_clicked()
     }
 
     file.close();
-    QMessageBox::information(this, QString("小安提示"),QString("导出成功！\n"));
+    QMessageBox::information(this, tr("xiaoantishi"),tr("导出成功！\n"));
 }
 
 void Dialog_deviceList::on_checkBox_ClearData_stateChanged(int arg1)
 {
     if(arg1 != 0){
-        QMessageBox::information(this, QString("小安提示"),QString("已经开启清除历史数据功能！\n"));
+        QMessageBox::information(this, tr("xiaoantishi"),tr("已经开启清除历史数据功能！\n"));
         ui->pushButton_ClearData->setEnabled(true);
     }else{
         ui->pushButton_ClearData->setEnabled(false);

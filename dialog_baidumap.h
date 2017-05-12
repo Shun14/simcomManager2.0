@@ -1,8 +1,8 @@
-#ifndef DIALOG_BAIDUMAP_H
+﻿#ifndef DIALOG_BAIDUMAP_H
 #define DIALOG_BAIDUMAP_H
 
 #include <QDialog>
-
+#include <QWebEngineView>
 namespace Ui {
 class Dialog_baiduMap;
 }
@@ -19,7 +19,7 @@ private:
     Ui::Dialog_baiduMap *ui;
     double lat = 0.0;
     double lon = 0.0;
-
+    QWebEngineView *view;
 private slots:
     void baiduMapLoadFinish();
 };

@@ -17,7 +17,7 @@
    </sizepolicy>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>小安宝设备查询软件</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>

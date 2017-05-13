@@ -1,4 +1,4 @@
-#include "dialog_devicelog.h"
+﻿#include "dialog_devicelog.h"
 #include "ui_dialog_devicelog.h"
 #include "dialog_findlog.h"
 #include "http_operate.h"
@@ -26,10 +26,10 @@ Dialog_deviceLog::Dialog_deviceLog(QWidget *parent) :
     endtime = QString::number(eventtime.endtime.toTime_t());
     QString url = "http://" + ptr->ui->lineEdit_IP->text().toLatin1() +
                   ":"+ptr->ui->lineEdit_port->text().toLatin1() +
-                  "/v1/deviceEvent/" + ptr->ui->lineEdit_IMEI->text().toLatin1() +
+                  "/admin/deviceEvent/" + ptr->ui->lineEdit_IMEI->text().toLatin1() +
                   "?start=" + starttime + "&end=" + endtime;
     qDebug()<<url;
-    QString result = http_operate::instance().httpOperarte(url, NULL, "GET", this);
+    QString result = http_operate::instance().httpOperarteWithAuth(url, NULL, "GET", &QString("foo"), &QString("bar"), this);
     qDebug()<< result;
     QJsonDocument jsonDocument = QJsonDocument::fromJson(result.toLatin1());
     if( jsonDocument.isNull() ){
@@ -64,10 +64,10 @@ void Dialog_deviceLog::on_pushButton_Refresh_clicked()
     ui->label_Refresh->setText(tr("Refreshing"));
     QString url = "http://" + ptr->ui->lineEdit_IP->text().toLatin1() +
                   ":"+ptr->ui->lineEdit_port->text().toLatin1() +
-                  "/v1/deviceEvent/" + ptr->ui->lineEdit_IMEI->text().toLatin1() +
+                  "/admin/deviceEvent/" + ptr->ui->lineEdit_IMEI->text().toLatin1() +
                   "?start=" + starttime + "&end=" + endtime;
     qDebug()<<url;
-    QString result = http_operate::instance().httpOperarte(url, NULL, "GET", this);
+    QString result = http_operate::instance().httpOperarteWithAuth(url, NULL, "GET", &QString("foo"), &QString("bar"), this);
     qDebug()<< result;
     QJsonDocument jsonDocument = QJsonDocument::fromJson(result.toLatin1());
     if( jsonDocument.isNull() ){

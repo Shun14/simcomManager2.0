@@ -18,7 +18,7 @@ public:
 public:
     QString httpOperarte(const QString &url, const QString &data, const QString &type, QWidget *parent);
     QString httpsOperarteLeancloud(const QString &url, const QString &data, const QString &type, QWidget *parent);
-    QString httpOperarteWithAuth(const QString &url, const QString &data, const QString &type, QString &username, QString &passwd,QWidget *parent);
+    QString httpOperarteWithAuth(const QString &url, const QString &data, const QString &type, QString *username, QString *passwd,QWidget *parent);
 };
 
 #endif // HTTP_OPERATE_H

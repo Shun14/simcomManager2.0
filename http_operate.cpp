@@ -132,7 +132,7 @@ QString http_operate::httpsOperarteLeancloud(const QString &url, const QString &
     return _result;
 }
 
-QString http_operate::httpOperarteWithAuth(const QString &url, const QString &data, const QString &type, QString &username, QString &passwd, QWidget *parent) {
+QString http_operate::httpOperarteWithAuth(const QString &url, const QString &data, const QString &type, QString *username, QString *passwd, QWidget *parent) {
 
     QNetworkRequest _req;
 
@@ -144,11 +144,11 @@ QString http_operate::httpOperarteWithAuth(const QString &url, const QString &da
     _req.setUrl(QUrl(url));
     _req.setHeader(QNetworkRequest::ContentTypeHeader, QString("application/json"));
 
-    QString concatenated = username.toLatin1()+":"+passwd.toLatin1();
+    QString concatenated = username->toLatin1()+":"+passwd->toLatin1();
     QByteArray authData = concatenated.toLocal8Bit().toBase64();
 
     QString headerData = "Basic " + authData;
-
+    qDebug()<<headerData;
     _req.setRawHeader("Authorization", headerData.toLocal8Bit());
 
     QNetworkAccessManager authManager;

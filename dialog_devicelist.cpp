@@ -59,13 +59,13 @@ void Dialog_deviceList::keyPressEvent(QKeyEvent *event)
 
 void Dialog_deviceList::on_pushButton_ReadFile_clicked()
 {
-    QString path = QFileDialog::getOpenFileName(this, tr("小安宝设备查询软件"), ".", tr("Text Files(*.txt)"));
+    QString path = QFileDialog::getOpenFileName(this, tr("Electromble Query software"), ".", tr("Text Files(*.txt)"));//小安宝设备查询软件
     if(!path.isEmpty())
     {
         QFile file(path);
         if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
         {
-            QMessageBox::warning(this, tr("小安宝设备查询软件"), tr("文件打开失败:\n%1").arg(path));
+            QMessageBox::warning(this, tr("Electromble Query software"), tr("open file failed:\n%1").arg(path));
             return;
         }
         QTextStream stream(&file);
@@ -125,9 +125,9 @@ void Dialog_deviceList::findDeviceStatuswithRow(const int row){
     QString imeiString = ui->tableWidget->item(row, 0)->text();
     QString url = "http://" + ptr->ui->lineEdit_IP->text().toLatin1() +
                   ":"+ptr->ui->lineEdit_port->text().toLatin1() +
-                  "/v1/imeiData/" + imeiString;
+                  "/admin/imeiData/" + imeiString;
     qDebug()<<url;
-    QString result = http_operate::instance().httpOperarte(url, NULL, "GET", this);
+    QString result = http_operate::instance().httpOperarteWithAuth(url, NULL, "GET", &QString("foo"), &QString("bar"), this);
     qDebug()<<result;
     if(result.isEmpty()){
         return;
@@ -152,11 +152,11 @@ void Dialog_deviceList::findDeviceStatuswithRow(const int row){
         int state = object.take("state").toInt();
 
         if(state){
-            ui->tableWidget->setItem(row,2,new QTableWidgetItem("在   线"));
+            ui->tableWidget->setItem(row,2,new QTableWidgetItem("online"));//在线
             ui->tableWidget->item(row, 2)->setForeground(Qt::green);
         }
         else{
-            ui->tableWidget->setItem(row,2,new QTableWidgetItem("不在线"));
+            ui->tableWidget->setItem(row,2,new QTableWidgetItem("offline"));//不在线
             ui->tableWidget->item(row, 2)->setForeground(Qt::red);
         }
 
@@ -248,7 +248,7 @@ void Dialog_deviceList::on_tableWidget_cellDoubleClicked(int row, int column)
 void Dialog_deviceList::on_pushButton_ClearData_clicked()
 {
     QMessageBox message(QMessageBox::Warning, tr("xiaoantishi"),
-                        tr("确定要清除所有设备的数据?\r\n"),
+                        tr("are you sure you want to delete all device data?\r\n"),//确定要清除所有设备的数据
                         QMessageBox::Yes|QMessageBox::No, NULL);
     if (message.exec()==QMessageBox::No){
         return;
@@ -272,13 +272,13 @@ void Dialog_deviceList::on_pushButton_ClearData_clicked()
         }
         QJsonDocument jsonDocument = QJsonDocument::fromJson(result.toLatin1());
         if( jsonDocument.isNull() ){
-            QMessageBox::information(this, tr("xiaoantishi"),tr("查询Leancloud数据错误\n"));
+            QMessageBox::information(this, tr("xiaoantishi"),tr("looking for the Leanclound data error\n"));//查询Leancloud数据错误
             return;
         }
         QJsonObject object = jsonDocument.object();
         QJsonValue results = object.take("results");
         if(!results.isArray()){
-            QMessageBox::information(this, tr("xiaoantishi"),tr("查询Leancloud数据失败:%1\n").arg(imei));
+            QMessageBox::information(this, tr("xiaoantishi"),tr("looking for the Leanclound data error:%1\n").arg(imei));
             return;
         }
         QJsonArray array = results.toArray();
@@ -295,15 +295,15 @@ void Dialog_deviceList::on_pushButton_ClearData_clicked()
             http_operate http;
             result = http.httpsOperarteLeancloud(url, NULL, "DELETE", this);
             if(result.isEmpty()){
-                QMessageBox::information(this, tr("xiaoantishi"),tr("清理Leancloud数据失败：%1\n").arg(objectid));
+                QMessageBox::information(this, tr("xiaoantishi"),tr("looking for the Leanclound data error:%1\n").arg(objectid));
                 continue;
             }
         }
         url = "http://" + ptr->ui->lineEdit_IP->text().toLatin1() +
                 ":"+ptr->ui->lineEdit_port->text().toLatin1() +
-                "/v1/imeiData/" + imei;
+                "/admin/imeiData/" + imei;
         qDebug()<< url;
-        result = http_operate::instance().httpOperarte(url, NULL, "DELETE", this);
+        result = http_operate::instance().httpOperarteWithAuth(url, NULL, "DELETE", &QString("foo"), &QString("bar"),this);
         qDebug()<<result;
 
         if(result.isEmpty()){
@@ -318,12 +318,12 @@ void Dialog_deviceList::on_pushButton_ClearData_clicked()
         object = jsonDocument.object();
         QJsonValue code = object.take("code");
         if(code.toInt() != 0){
-            QMessageBox::information(this, tr("xiaoantishi"),tr("清理数据库数据失败\n%1")
+            QMessageBox::information(this, tr("xiaoantishi"),tr("delete the databases failed\n%1")//清理数据库数据失败
                                      .arg(ui->tableWidget->item(i,0)->text()));
             continue;
         }
         ui->tableWidget->setItem(i,1,new QTableWidgetItem(QString("-")));
-        ui->tableWidget->setItem(i,2,new QTableWidgetItem("已清除"));
+        ui->tableWidget->setItem(i,2,new QTableWidgetItem("cleared"));//已清除
         ui->tableWidget->setItem(i,3,new QTableWidgetItem(QString("-")));
         ui->tableWidget->setItem(i,4,new QTableWidgetItem(QString("-")));
         ui->tableWidget->setItem(i,5,new QTableWidgetItem(QString("-")));
@@ -336,11 +336,11 @@ void Dialog_deviceList::on_pushButton_ClearData_clicked()
 
 void Dialog_deviceList::on_pushButton_DeriveFile_clicked()
 {
-    QString filepath = QFileDialog::getSaveFileName (this,tr("导出数据"),"",tr("表格 (*.csv)"));
+    QString filepath = QFileDialog::getSaveFileName (this,tr("output data"),"",tr("form (*.csv)"));//导出数据 表格
 
     QFile file(filepath);
     if(!file.open(QFile::WriteOnly | QIODevice::Text)){
-        QMessageBox::information(this, tr("xiaoantishi"),tr("导出失败！\n"));
+        QMessageBox::information(this, tr("xiaoantishi"),tr("output failed!\n"));//导出失败！
         return;
     }
 
@@ -368,13 +368,13 @@ void Dialog_deviceList::on_pushButton_DeriveFile_clicked()
     }
 
     file.close();
-    QMessageBox::information(this, tr("xiaoantishi"),tr("导出成功！\n"));
+    QMessageBox::information(this, tr("xiaoantishi"),tr("output successful!\n"));//导出成功！
 }
 
 void Dialog_deviceList::on_checkBox_ClearData_stateChanged(int arg1)
 {
     if(arg1 != 0){
-        QMessageBox::information(this, tr("xiaoantishi"),tr("已经开启清除历史数据功能！\n"));
+        QMessageBox::information(this, tr("xiaoantishi"),tr("start deleting the history data function\n"));//已经开启清除历史数据功能！
         ui->pushButton_ClearData->setEnabled(true);
     }else{
         ui->pushButton_ClearData->setEnabled(false);
